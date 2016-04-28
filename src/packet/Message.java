@@ -1,14 +1,17 @@
 package packet;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 public class Message {
 	
 	private static final int maxExpectedUDPDatagram = 100;
 	
-	private byte[] receivedData;
+	private byte[] byteData;
 	
-	private String receivedDataHex;
+	private String dataHex;
 	
 	private String version;
 	
@@ -26,30 +29,58 @@ public class Message {
 	
 	private String payload;
 	
+	public Message(int version, String Source,
+			String Destination, int Type,
+			int Flag, int hopCount,
+			int length, String payload
+			) throws UnsupportedEncodingException{
+		
+		this.version = Integer.toHexString(version);
+		this.Source = createHexString(Source.getBytes("ASCII"));
+		this.Destination = createHexString(Destination.getBytes("ASCII"));
+		this.Type = Integer.toHexString(Type);
+		this.Flag = Integer.toHexString(Flag);
+		this.hopCount = Integer.toHexString(hopCount);
+		this.length = Integer.toHexString(length);
+		this.payload = createHexString(payload.getBytes("ASCII"));
+		
+		dataHex += version;
+		dataHex += Source;
+		dataHex += Destination;
+		dataHex += Type;
+		dataHex += Flag;
+		dataHex += hopCount;
+		dataHex += length;
+		dataHex += payload;
+		
+		byteData = hexToBytes(dataHex);
+		
+	}
+	
 	public Message(byte[] bytes) throws Exception{
 		
 		if(bytes.length > maxExpectedUDPDatagram){
 			//logger here needed
 			throw new Exception("Message received more data than expected >100");
 			}
-		receivedData = new byte[maxExpectedUDPDatagram];
-		receivedData = bytes;
-		receivedDataHex = createHexString(receivedData);
+		byteData = new byte[maxExpectedUDPDatagram];
+		byteData = bytes;
+		dataHex = createHexString(byteData);
 		splitData();
 		
 	}
 	
 	private void splitData(){
 		
-		version = receivedDataHex.substring(0, 2);
-		Source = receivedDataHex.substring(2, 18);
-		Destination = receivedDataHex.substring(18, 34);
-		Type = receivedDataHex.substring(34, 36);
-		Flag = receivedDataHex.substring(36, 38);
-		hopCount = receivedDataHex.substring(38, 40);
-		length = receivedDataHex.substring(40, 42);
+		version = dataHex.substring(0, 2);
+		Source = dataHex.substring(2, 18);
+		Destination = dataHex.substring(18, 34);
+		Type = dataHex.substring(34, 36);
+		Flag = dataHex.substring(36, 38);
+		hopCount = dataHex.substring(38, 40);
+		length = dataHex.substring(40, 42);
 		//21 bytes done, now the rest of it
-		payload = receivedDataHex.substring(42);
+		payload = dataHex.substring(42);
 		
 	}
 	
@@ -57,13 +88,19 @@ public class Message {
 		//in bigEndian
 		return DatatypeConverter.printHexBinary(bytes);
 	}
+	
+	private byte[] hexToBytes(String hexString) {
+	     HexBinaryAdapter adapter = new HexBinaryAdapter();
+	     byte[] bytes = adapter.unmarshal(hexString);
+	     return bytes;
+	}
 
 	public byte[] getReceivedData() {
-		return receivedData;
+		return byteData;
 	}
 
 	public void setReceivedData(byte[] receivedData) {
-		this.receivedData = receivedData;
+		this.byteData = receivedData;
 	}
 
 	public String getVersion() {
@@ -135,11 +172,11 @@ public class Message {
 	}
 
 	public String getReceivedDataHex() {
-		return receivedDataHex;
+		return dataHex;
 	}
 
 	public void setReceivedDataHex(String receivedDataHex) {
-		this.receivedDataHex = receivedDataHex;
+		this.dataHex = receivedDataHex;
 	}
 	
 	
