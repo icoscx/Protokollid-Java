@@ -33,7 +33,20 @@ public class Message {
 			String Destination, int Type,
 			int Flag, int hopCount,
 			int length, String payload
-			) throws UnsupportedEncodingException{
+			) throws UnsupportedEncodingException, Exception{
+		
+		if(version > 255 || Type > 255 ||
+				Flag > 255 || hopCount > 255 ||
+				length > 255
+				){
+			throw new Exception("Maximum size for integer is 255 > FF");
+		}
+		
+		if(Source.length() > 9 || Destination.length() > 9){
+			throw new Exception("Maximum size for string is 8 characters");
+		}
+		
+		if(payload.length() > 158){throw new Exception("Maximum size for paylaod is 79 characters");}
 		
 		this.version = Integer.toHexString(version);
 		this.Source = createHexString(Source.getBytes("ASCII"));
