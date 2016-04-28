@@ -1,6 +1,7 @@
 package packet;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
@@ -9,25 +10,25 @@ public class Message {
 	
 	private static final int maxExpectedUDPDatagram = 100;
 	
-	private byte[] byteData;
+	private byte[] byteData = null;
 	
-	private String dataHex;
+	private String dataHex = "";
 	
-	private String version;
+	private String version = "";
 	
-	private String Source;
+	private String Source = "";
 	
-	private String Destination;
+	private String Destination = "";
 	
-	private String Type;
+	private String Type = "";
 	
-	private String Flag;
+	private String Flag = "";
 	
-	private String hopCount;
+	private String hopCount = "";
 	
-	private String length;
+	private String length = "";
 	
-	private String payload;
+	private String payload = "";
 	
 	public Message(int version, String Source,
 			String Destination, int Type,
@@ -48,23 +49,23 @@ public class Message {
 		
 		if(payload.length() > 158){throw new Exception("Maximum size for paylaod is 79 characters");}
 		
-		this.version = Integer.toHexString(version);
+		this.version = Integer.toHexString(0x100 | version).substring(1);
 		this.Source = createHexString(Source.getBytes("ASCII"));
 		this.Destination = createHexString(Destination.getBytes("ASCII"));
-		this.Type = Integer.toHexString(Type);
-		this.Flag = Integer.toHexString(Flag);
-		this.hopCount = Integer.toHexString(hopCount);
-		this.length = Integer.toHexString(length);
+		this.Type = Integer.toHexString(0x100 | Type).substring(1);
+		this.Flag = Integer.toHexString(0x100 | Flag).substring(1);
+		this.hopCount = Integer.toHexString(0x100 | hopCount).substring(1);
+		this.length = Integer.toHexString(0x100 | length).substring(1);
 		this.payload = createHexString(payload.getBytes("ASCII"));
 		
-		dataHex += version;
-		dataHex += Source;
-		dataHex += Destination;
-		dataHex += Type;
-		dataHex += Flag;
-		dataHex += hopCount;
-		dataHex += length;
-		dataHex += payload;
+		dataHex += this.version;
+		dataHex += this.Source;
+		dataHex += this.Destination;
+		dataHex += this.Type;
+		dataHex += this.Flag;
+		dataHex += this.hopCount;
+		dataHex += this.length;
+		dataHex += this.payload;
 		
 		byteData = hexToBytes(dataHex);
 		
@@ -190,6 +191,13 @@ public class Message {
 
 	public void setReceivedDataHex(String receivedDataHex) {
 		this.dataHex = receivedDataHex;
+	}
+
+	@Override
+	public String toString() {
+		return "Message [byteData=" + createHexString(byteData) + ", dataHex=" + dataHex + ", version=" + version
+				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
+				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "]";
 	}
 	
 	
