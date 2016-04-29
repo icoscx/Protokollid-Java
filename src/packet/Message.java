@@ -49,13 +49,13 @@ public class Message {
 		
 		if(payload.length() > 158){throw new Exception("Maximum size for paylaod is 79 characters");}
 		
-		this.version = Integer.toHexString(0x100 | version).substring(1);
+		this.version = Integer.toHexString(0x100 | version).substring(1).toUpperCase();
 		this.Source = createHexString(Source.getBytes("ASCII"));
 		this.Destination = createHexString(Destination.getBytes("ASCII"));
-		this.Type = Integer.toHexString(0x100 | Type).substring(1);
-		this.Flag = Integer.toHexString(0x100 | Flag).substring(1);
-		this.hopCount = Integer.toHexString(0x100 | hopCount).substring(1);
-		this.length = Integer.toHexString(0x100 | length).substring(1);
+		this.Type = Integer.toHexString(0x100 | Type).substring(1).toUpperCase();
+		this.Flag = Integer.toHexString(0x100 | Flag).substring(1).toUpperCase();
+		this.hopCount = Integer.toHexString(0x100 | hopCount).substring(1).toUpperCase();
+		this.length = Integer.toHexString(0x100 | length).substring(1).toUpperCase();
 		this.payload = createHexString(payload.getBytes("ASCII"));
 		
 		dataHex += this.version;
@@ -77,7 +77,6 @@ public class Message {
 			//logger here needed
 			throw new Exception("Message received more data than expected >100");
 			}
-		byteData = new byte[maxExpectedUDPDatagram];
 		byteData = bytes;
 		dataHex = createHexString(byteData);
 		splitData();
@@ -108,13 +107,21 @@ public class Message {
 	     byte[] bytes = adapter.unmarshal(hexString);
 	     return bytes;
 	}
-
-	public byte[] getReceivedData() {
+	
+	public byte[] getByteData() {
 		return byteData;
 	}
 
-	public void setReceivedData(byte[] receivedData) {
-		this.byteData = receivedData;
+	public void setByteData(byte[] byteData) {
+		this.byteData = byteData;
+	}
+
+	public String getDataHex() {
+		return dataHex;
+	}
+
+	public void setDataHex(String dataHex) {
+		this.dataHex = dataHex;
 	}
 
 	public String getVersion() {
@@ -185,17 +192,16 @@ public class Message {
 		return maxExpectedUDPDatagram;
 	}
 
-	public String getReceivedDataHex() {
-		return dataHex;
-	}
-
-	public void setReceivedDataHex(String receivedDataHex) {
-		this.dataHex = receivedDataHex;
+	public void printBinary(){
+		for (byte b : byteData) {
+			System.out.print(b);
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "Message [byteData=" + createHexString(byteData) + ", dataHex=" + dataHex + ", version=" + version
+		printBinary();
+		return "  \nMessage [ dataHex=" + dataHex + ", version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
 				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "]";
 	}
