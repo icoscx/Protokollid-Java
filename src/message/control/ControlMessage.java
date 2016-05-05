@@ -11,7 +11,7 @@ public class ControlMessage extends Message {
 	
 	private static final int lengthOfData = 0;
 	
-	private static final String noPayload = null;
+	private static final String noPayload = "";
 
 	public ControlMessage(String Source, String Destination, int Flag) throws UnsupportedEncodingException, Exception {
 		

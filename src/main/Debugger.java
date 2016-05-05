@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import javax.xml.bind.DatatypeConverter;
 
 import message.Message;
+import message.control.ControlMessage;
+import message.control.type.ACKControl;
 import message.data.DataMessage;
 import message.data.type.FileData;
 
@@ -32,7 +34,7 @@ public class Debugger {
 		System.out.println(s.substring(2, 4));
 		*/
 		
-		DataMessage m3 = new FileData("abcd", "efgh", 40, "worth of payload");
+		Message m3 = new ACKControl("asbc", "asad");
 		System.out.println(m3.toString() + "\n");
 		Message m4 = new Message(m3.getByteData());
 		System.out.println(m4.toString());
