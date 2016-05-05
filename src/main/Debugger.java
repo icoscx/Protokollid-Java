@@ -6,11 +6,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 
 import javax.xml.bind.DatatypeConverter;
 
-import packet.Message;
+import message.Message;
+import message.data.DataMessage;
+import message.data.type.FileData;
 
+/**
+ * 
+ * @author ivo.pure
+ *
+ */
 public class Debugger {
 
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
@@ -24,11 +32,12 @@ public class Debugger {
 		System.out.println(s.substring(2, 4));
 		*/
 		
-		//System.out.println(Integer.toHexString(0x100 | 13).substring(1));
-		Message m1 = new Message(1, "abcdefgh", "ijklmnop", 100, 45, 11, 50, "abclolsnaiper");
-		System.out.println(m1.toString() + "\n");
-		Message m2Receivedm1 = new Message(m1.getByteData());
-		System.out.println(m2Receivedm1.toString() + "\n");
+		DataMessage m3 = new FileData("abcd", "efgh", 40, "worth of payload");
+		System.out.println(m3.toString() + "\n");
+		Message m4 = new Message(m3.getByteData());
+		System.out.println(m4.toString());
+		
+		
 		
 		/**
 		  //while(true){

@@ -1,4 +1,4 @@
-package packet;
+package message;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -6,9 +6,18 @@ import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+/**
+ * 
+ * @author ivo.pure
+ *
+ */
 public class Message {
 	
 	private static final int maxExpectedUDPDatagram = 100;
+	
+	private static final int currentVersion = 1;
+	
+	private static final int defaultHopCount = 15;
 	
 	private byte[] byteData = null;
 	
@@ -30,31 +39,28 @@ public class Message {
 	
 	private String payload = "";
 	
-	public Message(int version, String Source,
+	public Message(String Source,
 			String Destination, int Type,
-			int Flag, int hopCount,
+			int Flag,
 			int length, String payload
 			) throws UnsupportedEncodingException, Exception{
 		
-		if(version > 255 || Type > 255 ||
-				Flag > 255 || hopCount > 255 ||
-				length > 255
-				){
+		if(Type > 255 || Flag > 255 || length > 255){
 			throw new Exception("Maximum size for integer is 255 > FF");
 		}
 		
-		if(Source.length() > 9 || Destination.length() > 9){
-			throw new Exception("Maximum size for string is 8 characters");
+		if(Source.length() > 4 || Destination.length() > 4){
+			throw new Exception("Maximum size for string is 4 characters");
 		}
 		
-		if(payload.length() > 158){throw new Exception("Maximum size for paylaod is 79 characters");}
+		if(payload.length() > 87){throw new Exception("Maximum size for paylaod is 87 characters");}
 		
-		this.version = Integer.toHexString(0x100 | version).substring(1).toUpperCase();
+		this.version = Integer.toHexString(0x100 | currentVersion).substring(1).toUpperCase();
 		this.Source = createHexString(Source.getBytes("ASCII"));
 		this.Destination = createHexString(Destination.getBytes("ASCII"));
 		this.Type = Integer.toHexString(0x100 | Type).substring(1).toUpperCase();
 		this.Flag = Integer.toHexString(0x100 | Flag).substring(1).toUpperCase();
-		this.hopCount = Integer.toHexString(0x100 | hopCount).substring(1).toUpperCase();
+		this.hopCount = Integer.toHexString(0x100 | defaultHopCount).substring(1).toUpperCase();
 		this.length = Integer.toHexString(0x100 | length).substring(1).toUpperCase();
 		this.payload = createHexString(payload.getBytes("ASCII"));
 		
@@ -75,7 +81,7 @@ public class Message {
 		
 		if(bytes.length > maxExpectedUDPDatagram){
 			//logger here needed
-			throw new Exception("Message received more data than expected >100");
+			throw new Exception("Message received more data than expected > " + maxExpectedUDPDatagram);
 			}
 		byteData = bytes;
 		dataHex = createHexString(byteData);
@@ -86,14 +92,14 @@ public class Message {
 	private void splitData(){
 		
 		version = dataHex.substring(0, 2);
-		Source = dataHex.substring(2, 18);
-		Destination = dataHex.substring(18, 34);
-		Type = dataHex.substring(34, 36);
-		Flag = dataHex.substring(36, 38);
-		hopCount = dataHex.substring(38, 40);
-		length = dataHex.substring(40, 42);
-		//21 bytes done, now the rest of it
-		payload = dataHex.substring(42);
+		Source = dataHex.substring(2, 10);
+		Destination = dataHex.substring(10, 18);
+		Type = dataHex.substring(18, 20);
+		Flag = dataHex.substring(20, 22);
+		hopCount = dataHex.substring(22, 24);
+		length = dataHex.substring(24, 26);
+		//9 bytes done, now the rest of it
+		payload = dataHex.substring(26);
 		
 	}
 	
@@ -200,6 +206,7 @@ public class Message {
 
 	@Override
 	public String toString() {
+		System.out.print("Binary: ");
 		printBinary();
 		return "  \nMessage [ dataHex=" + dataHex + ", version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
