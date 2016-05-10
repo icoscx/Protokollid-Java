@@ -15,7 +15,7 @@ import message.control.ControlMessage;
 import message.control.type.ACKControl;
 import message.data.DataMessage;
 import message.data.type.FileData;
-import network.DatagramManager;
+import network.server.DatagramServer;
 
 /**
  * 
@@ -28,7 +28,9 @@ public class Debugger {
 		// TODO Auto-generated method stub
 
 		
-		DatagramManager dm = new DatagramManager(1023);
+		//DatagramManager dm = new DatagramManager(12344);
+		
+		
 		/**
 		byte[] abyte = "Message 2".getBytes();
 		String s = DatatypeConverter.printHexBinary(abyte);
@@ -36,13 +38,13 @@ public class Debugger {
 		System.out.println(s.substring(0, 2));
 		System.out.println(s.substring(2, 4));
 		*/
-		/**
+	
 		Message m3 = new ACKControl("asbc", "asad");
 		System.out.println(m3.toString() + "\n");
 		Message m4 = new Message(m3.getByteData());
 		System.out.println(m4.toString());
 		
-		*/
+		
 		
 		/**
 		  //while(true){

@@ -114,6 +114,11 @@ public class Message {
 	     return bytes;
 	}
 	
+	public int getMessageTotalLength(){
+		
+		return dataHex.length()/2;
+	}
+	
 	public byte[] getByteData() {
 		return byteData;
 	}
@@ -210,7 +215,7 @@ public class Message {
 		printBinary();
 		return "  \nMessage [ dataHex=" + dataHex + ", version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
-				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "]";
+				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " + getMessageTotalLength();
 	}
 	
 	

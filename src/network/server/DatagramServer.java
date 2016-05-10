@@ -1,4 +1,4 @@
-package network;
+package network.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,9 +10,9 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 
 
-public class DatagramManager {
+public class DatagramServer {
 	
-	public DatagramManager(int ListenPort){
+	public DatagramServer(int ListenPort){
 		
 		process(ListenPort);
 

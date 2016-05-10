@@ -16,13 +16,14 @@ class UDPClient
 	      sendData = sentence.getBytes();
 	      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 1023);
 	      clientSocket.send(sendPacket);
-	      
+	      /**
 	      byte[] receiveData = new byte[100];
 	      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 	      clientSocket.receive(receivePacket);
 	      String modifiedSentence = new String(receivePacket.getData());
 	      System.out.println("FROM SERVER:" + modifiedSentence);
 	      clientSocket.close();
+	      */
 	  }
    }
 }
