@@ -6,6 +6,7 @@ import message.control.ControlMessage;
 
 public class FileTrasnferInitControl extends ControlMessage {
 	
+	//0010 0000
 	private static final int fileTransFlag = 32;
 
 	public FileTrasnferInitControl(String Source, String Destination)

@@ -9,11 +9,14 @@ public class RoutingData extends DataMessage {
 	//0010 0000
 	private static final int routingFlag = 32;
 	
-	public RoutingData(String Source, String Destination, int length, String payload)
+	public RoutingData(String Source, String Destination, int length, String payload, boolean sequenceNumber, boolean lastFragment)
 			throws UnsupportedEncodingException, Exception {
 		
-		super(Source, Destination, routingFlag, length, payload);
+		super(Source, Destination, routingFlag, length, payload, sequenceNumber, lastFragment);
 		// TODO Auto-generated constructor stub
+			//fixFlag(sequenceNumber, lastFragment);
 	}
+	
+
 
 }

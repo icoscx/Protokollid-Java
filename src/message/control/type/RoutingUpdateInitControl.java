@@ -6,6 +6,7 @@ import message.control.ControlMessage;
 
 public class RoutingUpdateInitControl extends ControlMessage {
 	
+	//0001 0000
 	private static final int routingFlag = 16;
 
 	public RoutingUpdateInitControl(String Source, String Destination)

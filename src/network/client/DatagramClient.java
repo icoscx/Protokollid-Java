@@ -1,30 +1,55 @@
 package network.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 
 import message.Message;
+import network.MessageParser;
+
 
 public class DatagramClient {
 	
-	public DatagramClient(){
-		
-		
-	}
+	public boolean hasFailed = false;
 	
-	private void send(Message msg) throws Exception{
+	private Message message;
 	
-	      DatagramSocket clientSocket = new DatagramSocket();
-	      InetAddress IPAddress = InetAddress.getByName("172.29.5.35");
-	      byte[] sendData = new byte[msg.getMessageTotalLength()];
-	      sendData = msg.getByteData();
-	      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 1023);
-	      clientSocket.send(sendPacket);
+	public Message send(Message msg){
+
+		try {
+			InetAddress IPAddress = InetAddress.getByName(msg.getDestinationIP());
+			byte[] sendData = new byte[msg.getMessageTotalLength()];
+			sendData = msg.getByteData();
+			if(msg.getMessageTotalLength() != sendData.length){
+					throw new Exception("Calculated message data does not match real length of byte array to be sent");
+			}
+			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, msg.getDestinationPort());
+			DatagramSocket clientSocket = new DatagramSocket();
+			clientSocket.setSoTimeout(2000);
+			clientSocket.send(sendPacket);
+			//increased size for not crashing
+			byte[] receiveData = new byte[100];
+			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+			clientSocket.receive(receivePacket);
+			
+			clientSocket.close();
+			this.message = new Message(receivePacket.getData());
+			System.out.println("\nReceived message: " + message.toString());
+			
+			//not needed, reply should only be fixed size
+			MessageParser mp = new MessageParser();
+			message = mp.parser(message);
+			
+			return message;
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			this.hasFailed = true;
+		}
+		return msg;
+
 	      
 	}
+	
 
 }

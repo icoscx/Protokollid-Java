@@ -1,7 +1,6 @@
 package message;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
@@ -38,6 +37,12 @@ public class Message {
 	private String length = "";
 	
 	private String payload = "";
+	
+	private String sourceIP = "";
+	
+	private String destinationIP = "";
+	
+	private int destinationPort = 0;
 	
 	public Message(String Source,
 			String Destination, int Type,
@@ -119,6 +124,30 @@ public class Message {
 		return dataHex.length()/2;
 	}
 	
+	public String getSourceIP() {
+		return sourceIP;
+	}
+
+	public void setSourceIP(String sourceIP) {
+		this.sourceIP = sourceIP;
+	}
+
+	public String getDestinationIP() {
+		return destinationIP;
+	}
+
+	public void setDestinationIP(String destinationIP) {
+		this.destinationIP = destinationIP;
+	}
+
+	public int getDestinationPort() {
+		return destinationPort;
+	}
+
+	public void setDestinationPort(int destinationPort) {
+		this.destinationPort = destinationPort;
+	}
+
 	public byte[] getByteData() {
 		return byteData;
 	}
@@ -213,9 +242,10 @@ public class Message {
 	public String toString() {
 		System.out.print("Binary: ");
 		printBinary();
-		return "  \nMessage [ dataHex=" + dataHex + ", version=" + version
+		return "  \nMessage [ dataHex=" + dataHex + "\n, version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
-				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " + getMessageTotalLength();
+				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
+				+ getMessageTotalLength() + "| " + getDestinationIP() + ":" + getDestinationPort();
 	}
 	
 	
