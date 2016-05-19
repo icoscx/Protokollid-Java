@@ -1,6 +1,7 @@
 package message;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
@@ -39,6 +40,8 @@ public class Message {
 	private String payload = "";
 	
 	private String sourceIP = "";
+	
+	private int sourcePort = 0;
 	
 	private String destinationIP = "";
 	
@@ -88,10 +91,21 @@ public class Message {
 			//logger here needed
 			throw new Exception("Message received more data than expected > " + maxExpectedUDPDatagram);
 			}
-		byteData = bytes;
+		byteData = trimBytes(bytes);
 		dataHex = createHexString(byteData);
 		splitData();
 		
+	}
+	
+	public byte[] trimBytes(byte[] bytes){
+		
+		int length = 0;
+		String hexDataOfLength = "";
+		
+		hexDataOfLength = createHexString(bytes).substring(24, 26);
+		length = Integer.decode("0x" + hexDataOfLength);
+		
+		return Arrays.copyOfRange(bytes, 0, 13 + length);
 	}
 	
 	private void splitData(){
@@ -105,6 +119,7 @@ public class Message {
 		length = dataHex.substring(24, 26);
 		//9 bytes done, now the rest of it
 		payload = dataHex.substring(26);
+		
 		
 	}
 	
@@ -124,6 +139,15 @@ public class Message {
 		return dataHex.length()/2;
 	}
 	
+	
+	public int getSourcePort() {
+		return sourcePort;
+	}
+
+	public void setSourcePort(int sourcePort) {
+		this.sourcePort = sourcePort;
+	}
+
 	public String getSourceIP() {
 		return sourceIP;
 	}
@@ -245,7 +269,8 @@ public class Message {
 		return "  \nMessage [ dataHex=" + dataHex + "\n, version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
 				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
-				+ getMessageTotalLength() + "| " + getDestinationIP() + ":" + getDestinationPort();
+				+ getMessageTotalLength() + "| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
+				"| srcip/port: " + getSourceIP() + ":" + getSourcePort();
 	}
 	
 	

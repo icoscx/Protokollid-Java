@@ -3,6 +3,7 @@ package network.client;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 
 import message.Message;
 import network.MessageParser;
@@ -13,6 +14,10 @@ public class DatagramClient {
 	public boolean hasFailed = false;
 	
 	private Message message;
+	
+	public String error = "";
+	
+	private static final int socketTimeOut = 2000;
 	
 	public Message send(Message msg){
 
@@ -25,26 +30,31 @@ public class DatagramClient {
 			}
 			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, msg.getDestinationPort());
 			DatagramSocket clientSocket = new DatagramSocket();
-			clientSocket.setSoTimeout(2000);
+			clientSocket.setSoTimeout(socketTimeOut);
 			clientSocket.send(sendPacket);
 			//increased size for not crashing
 			byte[] receiveData = new byte[100];
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			clientSocket.receive(receivePacket);
-			
+			//System.out.println(clientSocket.getLocalPort());
 			clientSocket.close();
-			this.message = new Message(receivePacket.getData());
-			System.out.println("\nReceived message: " + message.toString());
 			
+			//????????????????????????????????????
+			if(receiveData.length < 13){
+				throw new Exception("DatagramClient: Packet length shorter than 13 bytes");
+			}
+			this.message = new Message(receivePacket.getData());
+
 			//not needed, reply should only be fixed size
-			MessageParser mp = new MessageParser();
-			message = mp.parser(message);
+			//MessageParser mp = new MessageParser();
+			//message = mp.parser(message);
 			
 			return message;
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			this.hasFailed = true;
+			error = e.toString();
 		}
 		return msg;
 
