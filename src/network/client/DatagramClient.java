@@ -21,6 +21,8 @@ public class DatagramClient {
 	
 	public Message send(Message msg){
 
+		this.message = msg;
+		
 		try {
 			InetAddress IPAddress = InetAddress.getByName(msg.getDestinationIP());
 			byte[] sendData = new byte[msg.getMessageTotalLength()];
@@ -49,14 +51,14 @@ public class DatagramClient {
 			//MessageParser mp = new MessageParser();
 			//message = mp.parser(message);
 			
-			return message;
+			//return message;
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			this.hasFailed = true;
 			error = e.toString();
 		}
-		return msg;
+		return message;
 
 	      
 	}

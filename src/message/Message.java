@@ -19,7 +19,7 @@ public class Message {
 	
 	private static final int defaultHopCount = 15;
 	
-	private byte[] byteData = null;
+	private byte[] byteData;
 	
 	private String dataHex = "";
 	

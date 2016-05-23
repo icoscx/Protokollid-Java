@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 
 import com.sun.corba.se.impl.ior.ByteBuffer;
 
+import jdk.nashorn.internal.ir.ThrowNode;
 import message.Message;
 import message.data.type.TextMessageData;
 import network.client.DatagramClient;
@@ -23,7 +24,9 @@ public class Debugger {
 
 		
 	    ExecutorService service = Executors.newFixedThreadPool(2);
-	    service.submit(new DatagramServer(12344));
+	    DatagramServer dm = new DatagramServer(12344);
+	    service.submit(dm);
+	    
 	    //service.submit();
 
 	    //service.shutdown();
@@ -31,6 +34,7 @@ public class Debugger {
 
 	    //System.exit(0);
 	    /**
+	    while(true){
 		String s = "";
 		Message m1 = new TextMessageData("aaaa", "xxxx", s.length() , s, false, true);
 		m1.setDestinationIP("172.16.5.240");
@@ -38,9 +42,28 @@ public class Debugger {
 		System.out.println("\nSending:" + m1.toString());
 		DatagramClient dc1 = new DatagramClient();
 		m1 = dc1.send(m1);
-		if(!dc1.hasFailed){System.out.println("\nResponseReifned:"+m1.toString());}else{System.err.println(dc1.error);}
+		if(!dc1.hasFailed){
+			System.out.println("\nResponseReifned:"+m1.toString());
+			}else{
+				System.err.println(dc1.error);
+			}
+		Thread.sleep(2000);
+	    }
+	    */
+		
+	    
+	    Message m1;
+	    while(true){
+	    	
+	    	if(!dm.receivedPacket.isEmpty()){
+	    		m1 = dm.receivedPacket.pop();
+	    		System.out.println("Sending: "+ m1.toString());
+	    		dm.forSendingPacket.push(m1);
+	    	}
 
-		*/
+	    }
+	    
+	    
 		
 	}
 

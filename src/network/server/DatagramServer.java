@@ -1,15 +1,15 @@
 package network.server;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.Stack;
 import java.util.concurrent.Callable;
 
 import message.Message;
@@ -18,6 +18,11 @@ import message.Message;
 public class DatagramServer implements Callable<Object>{
 	
 	protected int port = 0;
+	
+	public Stack<Message> receivedPacket = new Stack<Message>();
+	
+	public Stack<Message> forSendingPacket = new Stack<Message>();
+	
 	/**
 	 * Port to listen. If behind NAT, Port forwarding needs to be configured.
 	 * @param ListenPort
@@ -38,7 +43,7 @@ public class DatagramServer implements Callable<Object>{
 	
 	private void process(int port) {
         try {
-        	//System.out.println("Listening on: " + port);
+        	System.out.println("Listening on: " + port);
             Selector selector = Selector.open();
             DatagramChannel channel = DatagramChannel.open();
             InetSocketAddress isa = new InetSocketAddress(port);
@@ -116,9 +121,24 @@ public class DatagramServer implements Callable<Object>{
 
 				Message aMessage = new Message(bytearr);
 				
-				con.requestBuffer.clear();
+				//System.out.println(aMessage.toString());
 				
-				con.responseBuffer = Charset.forName( "ASCII" ).newEncoder().encode(CharBuffer.wrap("send the same string"));
+				receivedPacket.push(aMessage);
+				
+				con.requestBuffer.clear();
+
+				while(true){
+					if(forSendingPacket.isEmpty()){
+						continue;
+					}else if(!forSendingPacket.empty()){
+						con.responseBuffer = ByteBuffer.wrap(forSendingPacket.pop().getByteData());
+						break;
+					}
+				}
+				
+				con.responseBuffer.clear();
+				
+				//con.responseBuffer = Charset.forName( "ASCII" ).newEncoder().encode(CharBuffer.wrap("send the same string"));
 
 			}
 
