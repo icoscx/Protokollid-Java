@@ -9,6 +9,7 @@ import com.sun.corba.se.impl.ior.ByteBuffer;
 import jdk.nashorn.internal.ir.ThrowNode;
 import message.Message;
 import message.data.type.TextMessageData;
+import network.Responder;
 import network.client.DatagramClient;
 import network.server.DatagramServer;
 
@@ -22,11 +23,27 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
-		
+		/**
 	    ExecutorService service = Executors.newFixedThreadPool(2);
 	    DatagramServer dm = new DatagramServer(12344);
 	    service.submit(dm);
-	    
+	    */
+		
+		DatagramServer dm = new DatagramServer(12344);
+		dm.start();
+
+		Responder responder = new Responder(dm);
+		responder.start();
+		
+		
+		/**
+	    while(true){
+	    	if(!dm.receivedPackets.isEmpty()){
+			    DatagramClient dc = new DatagramClient();
+			    dc.send(dm.receivedPackets.pop());
+	    	}
+	    }
+	    */
 	    //service.submit();
 
 	    //service.shutdown();
@@ -51,18 +68,18 @@ public class Debugger {
 	    }
 	    */
 		
-	    
+	    /**
 	    Message m1;
 	    while(true){
 	    	
-	    	if(!dm.receivedPacket.isEmpty()){
-	    		m1 = dm.receivedPacket.pop();
+	    	if(!dm.receivedPackets.isEmpty()){
+	    		m1 = dm.receivedPackets.pop();
 	    		System.out.println("Sending: "+ m1.toString());
 	    		dm.forSendingPacket.push(m1);
 	    	}
 
 	    }
-	    
+	    */
 	    
 		
 	}

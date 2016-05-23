@@ -2,46 +2,44 @@ package network.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.concurrent.Callable;
 
+import com.sun.xml.internal.bind.annotation.OverrideAnnotationOf;
+
 import message.Message;
 
 
-public class DatagramServer implements Callable<Object>{
+public class DatagramServer extends Thread{
 	
 	protected int port = 0;
 	
-	public Stack<Message> receivedPacket = new Stack<Message>();
+	private Thread t;
 	
-	public Stack<Message> forSendingPacket = new Stack<Message>();
+	public volatile Stack<Message> receivedPackets = new Stack<Message>();
 	
 	/**
 	 * Port to listen. If behind NAT, Port forwarding needs to be configured.
 	 * @param ListenPort
 	 */
 	public DatagramServer(int ListenPort){
-		
-		//process(ListenPort);
 		this.port = ListenPort;
+	}
+	
+	 public void start(){
+	     if (t == null)
+	      {
+	         t = new Thread (this);
+	         t.start ();
+	      }
+	 }
 
-	}
-	
-	@Override
-	public Object call() throws Exception {
-		// TODO Auto-generated method stub
-		process(this.port);
-		return null;
-	}
-	
-	private void process(int port) {
+	public void run() {
         try {
         	System.out.println("Listening on: " + port);
             Selector selector = Selector.open();
@@ -65,10 +63,8 @@ public class DatagramServer implements Callable<Object>{
                             }
 
                             if (key.isReadable()) {
+                            	System.out.println("Key readable, reading...");
                                 read(key);
-                                key.interestOps(SelectionKey.OP_WRITE);
-                            } else if (key.isWritable()) {
-                                write(key);
                                 key.interestOps(SelectionKey.OP_READ);
                             }
                         } catch (Exception e) {
@@ -121,26 +117,19 @@ public class DatagramServer implements Callable<Object>{
 
 				Message aMessage = new Message(bytearr);
 				
-				//System.out.println(aMessage.toString());
+				aMessage.setDestinationIP(((InetSocketAddress)con.socketAddress).getHostString());
 				
-				receivedPacket.push(aMessage);
+				aMessage.setDestinationPort(((InetSocketAddress)con.socketAddress).getPort());
+				
+				System.out.println("\nReceived message: "+ aMessage.toString());
+				
+				receivedPackets.push(aMessage);
 				
 				con.requestBuffer.clear();
 
-				while(true){
-					if(forSendingPacket.isEmpty()){
-						continue;
-					}else if(!forSendingPacket.empty()){
-						con.responseBuffer = ByteBuffer.wrap(forSendingPacket.pop().getByteData());
-						break;
-					}
-				}
-				
-				con.responseBuffer.clear();
-				
-				//con.responseBuffer = Charset.forName( "ASCII" ).newEncoder().encode(CharBuffer.wrap("send the same string"));
-
 			}
+			
+			
 
 			
 		} catch (Exception e) {
@@ -148,7 +137,7 @@ public class DatagramServer implements Callable<Object>{
 			System.err.println(e.getMessage());
 		} 
     }
-
+    /**
     private void write(SelectionKey key){
     	
         try {
@@ -163,6 +152,7 @@ public class DatagramServer implements Callable<Object>{
 		}
         
     }
+    */
 
 
 

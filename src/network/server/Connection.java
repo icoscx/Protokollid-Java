@@ -21,6 +21,11 @@ public class Connection {
     	requestBuffer = ByteBuffer.allocate(receivingBufferSize);
     	responseBuffer = ByteBuffer.allocate(responseBufferSize);
     }
+    
+    public void setResponseBufferSize(int i){
+    	
+    	this.responseBuffer = ByteBuffer.allocate(i);
+    }
 	
 	
 }

@@ -19,13 +19,19 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 import message.Message;
+import network.Responder;
+import network.client.DatagramClient;
 import network.server.DatagramServer;
 
-public class MainWindow {
+public class MainWindow{
 
+	private Thread t;
 	protected Shell shlChatV;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Text DebugText;
+	static DatagramServer dm = new DatagramServer(12344);
+	static Responder responder = new Responder(dm);
+	static MainWindow window = new MainWindow();
 	
 	/**
 	 * Launch the application.
@@ -33,31 +39,47 @@ public class MainWindow {
 	 */
 	public static void main(String[] args) {
 		
-			//ExecutorService service = Executors.newFixedThreadPool(2);
-			
-			MainWindow window = new MainWindow();
-			
-			window.open();
+		//DatagramServer dm = new DatagramServer(12344);
+		dm.start();
+		
+		//Responder responder = new Responder(dm);
+		responder.start();
+
+		window.open();
+		
+		//window.DebugText.append(responder.data.pop());
 
 	}
-
 	/**
 	 * Open the window.
 	 * @return 
 	 */
-	public Runnable open() {
+	public void open() {
 		Display display = Display.getDefault();
 		createContents();
 		shlChatV.open();
 		shlChatV.layout();
-		
+
 		while (!shlChatV.isDisposed()) {
 
 			if (!display.readAndDispatch()) {
 				display.sleep();
-			}//siia
+			}
+			display.asyncExec(new Runnable() {//asnybc!
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					if(!responder.data.isEmpty()){
+						
+						DebugText.append(responder.data.pop());
+						//shlChatV.redraw();
+					}
+					
+				}
+			});
+			
 		}
-		return Thread.currentThread();
 	}
 
 	/**
@@ -87,7 +109,7 @@ public class MainWindow {
 		comp_debugger.setSize(759, 395);
 		comp_debugger.setLayout(null);
 		
-		DebugText = new Text(comp_debugger, SWT.BORDER);
+		DebugText = new Text(comp_debugger, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		DebugText.setEditable(false);
 		DebugText.setLocation(0, 0);
 		DebugText.setSize(749, 385);

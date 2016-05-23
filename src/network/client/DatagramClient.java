@@ -30,10 +30,15 @@ public class DatagramClient {
 			if(msg.getMessageTotalLength() != sendData.length){
 					throw new Exception("Calculated message data does not match real length of byte array to be sent");
 			}
+			System.out.println("\nSending: " + msg.toString() + "\n");
 			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, msg.getDestinationPort());
 			DatagramSocket clientSocket = new DatagramSocket();
 			clientSocket.setSoTimeout(socketTimeOut);
 			clientSocket.send(sendPacket);
+			clientSocket.close();
+			
+			/**
+			
 			//increased size for not crashing
 			byte[] receiveData = new byte[100];
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -46,7 +51,7 @@ public class DatagramClient {
 				throw new Exception("DatagramClient: Packet length shorter than 13 bytes");
 			}
 			this.message = new Message(receivePacket.getData());
-
+			*/
 			//not needed, reply should only be fixed size
 			//MessageParser mp = new MessageParser();
 			//message = mp.parser(message);

@@ -1,7 +1,9 @@
 package message;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
@@ -264,13 +266,26 @@ public class Message {
 
 	@Override
 	public String toString() {
-		System.out.print("Binary: ");
-		printBinary();
+		//System.out.print("Binary: ");
+		//printBinary();
 		return "  \nMessage [ dataHex=" + dataHex + "\n, version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
 				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
 				+ getMessageTotalLength() + "| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
 				"| srcip/port: " + getSourceIP() + ":" + getSourcePort();
+	}
+	
+	public String debugString(){
+		
+		 Date dNow = new Date( );
+	     SimpleDateFormat ft = 
+	     new SimpleDateFormat ("dd.MM HH:mm:ss:SSSS");
+		
+		return "[" + ft.format(dNow) +"] version=" + version
+				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
+				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
+				+ getMessageTotalLength() + "| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
+				"| srcip/port: " + getSourceIP() + ":" + getSourcePort() + "\n";
 	}
 	
 	
