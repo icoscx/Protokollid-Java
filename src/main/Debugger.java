@@ -3,13 +3,10 @@ package main;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import com.sun.corba.se.impl.ior.ByteBuffer;
-
 import jdk.nashorn.internal.ir.ThrowNode;
 import message.Message;
 import message.data.type.TextMessageData;
-import network.Responder;
 import network.client.DatagramClient;
 import network.server.DatagramServer;
 
@@ -19,6 +16,8 @@ import network.server.DatagramServer;
  *
  */
 public class Debugger {
+	
+	static DatagramServer dm = new DatagramServer(12344);
 
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
@@ -29,12 +28,10 @@ public class Debugger {
 	    service.submit(dm);
 	    */
 		
-		DatagramServer dm = new DatagramServer(12344);
+		//DatagramServer dm = new DatagramServer(12344);
+		
 		dm.start();
 
-		Responder responder = new Responder(dm);
-		responder.start();
-		
 		
 		/**
 	    while(true){

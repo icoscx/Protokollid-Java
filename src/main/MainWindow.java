@@ -3,34 +3,21 @@ package main;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Menu;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-
-import message.Message;
-import network.Responder;
-import network.client.DatagramClient;
 import network.server.DatagramServer;
 
 public class MainWindow{
 
-	private Thread t;
 	protected Shell shlChatV;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Text DebugText;
 	static DatagramServer dm = new DatagramServer(12344);
-	static Responder responder = new Responder(dm);
 	static MainWindow window = new MainWindow();
 	
 	/**
@@ -39,15 +26,9 @@ public class MainWindow{
 	 */
 	public static void main(String[] args) {
 		
-		//DatagramServer dm = new DatagramServer(12344);
 		dm.start();
-		
-		//Responder responder = new Responder(dm);
-		responder.start();
 
 		window.open();
-		
-		//window.DebugText.append(responder.data.pop());
 
 	}
 	/**
@@ -70,9 +51,9 @@ public class MainWindow{
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					if(!responder.data.isEmpty()){
+					if(!dm.debugMessages.isEmpty()){
 						
-						DebugText.append(responder.data.pop());
+						DebugText.append(dm.debugMessages.pop());
 						//shlChatV.redraw();
 					}
 					

@@ -14,6 +14,7 @@ public class Connection {
     public Connection(){
     	
     	requestBuffer = ByteBuffer.allocate(receivingBufferSize);
+    	responseBuffer = ByteBuffer.allocate(receivingBufferSize);
     }
     
     public Connection(int responseBufferSize){

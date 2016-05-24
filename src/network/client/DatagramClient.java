@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 
 import message.Message;
 import network.MessageParser;
+import network.NetworkVars;
 
 
 public class DatagramClient {
@@ -16,8 +17,6 @@ public class DatagramClient {
 	private Message message;
 	
 	public String error = "";
-	
-	private static final int socketTimeOut = 2000;
 	
 	public Message send(Message msg){
 
@@ -32,8 +31,9 @@ public class DatagramClient {
 			}
 			System.out.println("\nSending: " + msg.toString() + "\n");
 			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, msg.getDestinationPort());
+			//DatagramSocket clientSocket = new DatagramSocket(NetworkVars.sendingPort);
 			DatagramSocket clientSocket = new DatagramSocket();
-			clientSocket.setSoTimeout(socketTimeOut);
+			clientSocket.setSoTimeout(NetworkVars.socketTimeOut);
 			clientSocket.send(sendPacket);
 			clientSocket.close();
 			

@@ -279,7 +279,7 @@ public class Message {
 		
 		 Date dNow = new Date( );
 	     SimpleDateFormat ft = 
-	     new SimpleDateFormat ("dd.MM HH:mm:ss:SSSS");
+	     new SimpleDateFormat ("dd.MM HH:mm:ss:SSS");
 		
 		return "[" + ft.format(dNow) +"] version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
