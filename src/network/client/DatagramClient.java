@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import message.Message;
-import network.MessageParser;
+import network.ParsingFunctions;
 import network.NetworkVars;
 
 

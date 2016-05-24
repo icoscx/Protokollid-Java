@@ -12,7 +12,7 @@ public class TextMessageData extends DataMessage {
 	public TextMessageData(String Source, String Destination, int length, String payload, boolean sequenceNumber, boolean lastFragment)
 			throws UnsupportedEncodingException, Exception {
 		
-		super(Source, Destination, fixFlag(sequenceNumber, lastFragment), length, payload, sequenceNumber, lastFragment);
+		super(Source, Destination, fixTextMessageFlag(sequenceNumber, lastFragment), length, payload, sequenceNumber, lastFragment);
 		// TODO Auto-generated constructor stub
 			//fixFlag(sequenceNumber, lastFragment);
 	}

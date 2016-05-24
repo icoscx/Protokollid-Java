@@ -1,14 +1,6 @@
 package main;
 
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import com.sun.corba.se.impl.ior.ByteBuffer;
-import jdk.nashorn.internal.ir.ThrowNode;
-import message.Message;
-import message.data.type.TextMessageData;
-import network.client.DatagramClient;
-import network.server.DatagramServer;
 
 /**
  * 
@@ -17,11 +9,54 @@ import network.server.DatagramServer;
  */
 public class Debugger {
 	
-	static DatagramServer dm = new DatagramServer(12344);
+	//static DatagramServer dm = new DatagramServer(12344);
 
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
+		
+		
+		
+		/**
+		Stack<Message> stack = new Stack<>();
+		
+		stack.push(new InitializeAuth("AAAA", "BBBB"));
+		stack.push(new SuccessAuth("AAAA", "ssss"));
+		stack.push(new ACKSQ0Control("aaaa", "BBBB"));
+		stack.push(new ACKSQ1Control("AAAA", "AAAA"));
+		stack.push(new FileTrasnferInitControl("AAAA", "BBBB"));
+		stack.push(new KeepAliveControl("ssss", "ssss"));
+		stack.push(new RoutingUpdateInitControl("ssss", "aaaa"));
+		stack.push(new RSTControl("AAAA", "BBBB"));
+		stack.push(new SessionInitControl("AAAA", "ssss"));
+		stack.push(new FileData("AAAA", "BBBB", 1, "1", false, true));
+		stack.push(new RoutingData("SSSS", "ssss", 1, "1", false, true));
+		stack.push(new TextMessageData("aaaa", "ssss", 1, "1", false, true));
+		stack.push(new SessionData("SSSS", "aaaa", 1, "1", false, true));
+		
+		stack.push(new FileData("AAAA", "BBBB", 1, "1", false, false));
+		stack.push(new RoutingData("SSSS", "ssss", 1, "1", false, false));
+		stack.push(new TextMessageData("aaaa", "ssss", 1, "1", false, false));
+		stack.push(new SessionData("SSSS", "aaaa", 1, "1", false, false));
+		
+		stack.push(new FileData("AAAA", "BBBB", 1, "1", true, true));
+		stack.push(new RoutingData("SSSS", "ssss", 1, "1", true, true));
+		stack.push(new TextMessageData("aaaa", "ssss", 1, "1", true, true));
+		stack.push(new SessionData("SSSS", "aaaa", 1, "1", true, true));
+		
+		stack.push(new FileData("AAAA", "BBBB", 1, "1", true, false));
+		stack.push(new RoutingData("SSSS", "ssss", 1, "1", true, false));
+		stack.push(new TextMessageData("aaaa", "ssss", 1, "1", true, false));
+		stack.push(new SessionData("SSSS", "aaaa", 1, "1", true, false));
+
+		 
+		
+		for (Message message : stack) {
+			System.out.println(message.getClass().getName() + " " + message.getType() + " " + message.getFlag());
+			
+		}
+		
+		
 		/**
 	    ExecutorService service = Executors.newFixedThreadPool(2);
 	    DatagramServer dm = new DatagramServer(12344);
@@ -30,7 +65,7 @@ public class Debugger {
 		
 		//DatagramServer dm = new DatagramServer(12344);
 		
-		dm.start();
+		//dm.start();
 
 		
 		/**

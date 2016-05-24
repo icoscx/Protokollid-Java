@@ -46,8 +46,13 @@ public class DataMessage extends Message {
 		// TODO Auto-generated constructor stub
 	}
 	*/
-	
-	protected static int fixFlag(boolean sequenceNumber, boolean lastFragment){
+	/**
+	 * 
+	 * @param sequenceNumber false; true;
+	 * @param lastFragment false; true
+	 * @return 0000 1001, 0000 1011, 0000 1000, 0000 1010
+	 */
+	protected static int fixFileDataMessageFlag(boolean sequenceNumber, boolean lastFragment){
 		
 		if(!sequenceNumber && lastFragment){
 			//0000 1001
@@ -69,7 +74,69 @@ public class DataMessage extends Message {
 		
 		return 8;
 		
-	} 
+	}
+	
+	protected static int fixTextMessageFlag(boolean sequenceNumber, boolean lastFragment){
+			
+			if(!sequenceNumber && lastFragment){
+				//0000 0101
+				return 5;
+			}else if(sequenceNumber && lastFragment){
+				//0000 0111
+				return 7;
+			}else if(!sequenceNumber && !lastFragment){
+				//0000 0100
+				return 4;
+			}else if(sequenceNumber && !lastFragment){
+				//0000 0110
+				return 6;
+			}
+			
+			return 4;
+			
+	}
+	
+	protected static int fixSessionDataFlag(boolean sequenceNumber, boolean lastFragment){
+		
+		if(!sequenceNumber && lastFragment){
+			//0001 0001
+			return 17;
+		}else if(sequenceNumber && lastFragment){
+			//0001 0011
+			return 19;
+		}else if(!sequenceNumber && !lastFragment){
+			//0001 0000
+			return 16;
+		}else if(sequenceNumber && !lastFragment){
+			//0001 0010
+			return 18;
+		}
+		
+		return 16;
+		
+	}
+	
+	protected static int fixRoutingDataFlag(boolean sequenceNumber, boolean lastFragment){
+		
+		if(!sequenceNumber && lastFragment){
+			//0010 0001
+			return 33;
+		}else if(sequenceNumber && lastFragment){
+			//0010 0011
+			return 35;
+		}else if(!sequenceNumber && !lastFragment){
+			//0010 0000
+			return 32;
+		}else if(sequenceNumber && !lastFragment){
+			//0010 0010
+			return 34;
+		}
+		
+		return 32;
+		
+	}
+	
+	
 	
 	
 

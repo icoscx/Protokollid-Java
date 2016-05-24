@@ -3,14 +3,11 @@ package network.server;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Stack;
-import java.util.concurrent.Callable;
 import message.Message;
 
 
@@ -71,11 +68,11 @@ public class DatagramServer extends Thread{
                             }
 
                             if (key.isReadable()) {
-                            	System.out.println("*****Key readable, reading...*****");
+                            	//System.out.println("*****Key readable, reading...*****");
                                 read(key);
                                 key.interestOps(SelectionKey.OP_WRITE);
                             } else if (key.isWritable()) {
-                            	System.out.println("*****Key writable, writing...*****");
+                            	//System.out.println("*****Key writable, writing...*****");
                                 write(key);
                                 key.interestOps(SelectionKey.OP_READ);
                             }
@@ -154,7 +151,9 @@ public class DatagramServer extends Thread{
 						debugMessages.push(new String("Sent: \n"));
 						debugMessages.push(forSendingPacket.peek().debugString());
 						con.responseBuffer = ByteBuffer.wrap(forSendingPacket.pop().getByteData());
+						////////////////
 						Thread.sleep(1);
+						////////////////
 					}
 
 				}

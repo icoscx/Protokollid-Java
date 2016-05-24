@@ -7,12 +7,12 @@ import message.data.DataMessage;
 public class FileData extends DataMessage {
 	
 	//0000 1000
-	private static final int fileDataFlag = 8;
+	//private static final int fileDataFlag = 8;
 
 	public FileData(String Source, String Destination, int length, String payload, boolean sequenceNumber, boolean lastFragment)
 			throws UnsupportedEncodingException, Exception {
 
-		super(Source, Destination, fileDataFlag, length, payload, sequenceNumber, lastFragment);
+		super(Source, Destination, fixFileDataMessageFlag(sequenceNumber, lastFragment), length, payload, sequenceNumber, lastFragment);
 		// TODO Auto-generated constructor stub
 			//fixFlag(sequenceNumber, lastFragment);
 	}

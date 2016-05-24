@@ -11,6 +11,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import network.server.DatagramServer;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Label;
 
 public class MainWindow{
 
@@ -19,6 +21,10 @@ public class MainWindow{
 	private Text DebugText;
 	static DatagramServer dm = new DatagramServer(12344);
 	static MainWindow window = new MainWindow();
+	private Text ChatWindow;
+	private Text Users;
+	private Text EnterChat;
+	public static String UUID = "ABCD";
 	
 	/**
 	 * Launch the application.
@@ -56,10 +62,8 @@ public class MainWindow{
 						DebugText.append(dm.debugMessages.pop());
 						//shlChatV.redraw();
 					}
-					
 				}
 			});
-			
 		}
 	}
 
@@ -79,11 +83,46 @@ public class MainWindow{
 		comp_main.setSize(773, 408);
 		comp_main.setLayout(null);
 		
+		ChatWindow = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		ChatWindow.setEditable(false);
+		ChatWindow.setBounds(10, 10, 584, 343);
+		formToolkit.adapt(ChatWindow, true, true);
+		
+		Users = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		Users.setEditable(false);
+		Users.setBounds(602, 36, 131, 290);
+		formToolkit.adapt(Users, true, true);
+		
+		EnterChat = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		EnterChat.setBounds(22, 364, 515, 21);
+		formToolkit.adapt(EnterChat, true, true);
+		
+		Button SubmitChat = new Button(comp_main, SWT.NONE);
+		SubmitChat.setBounds(543, 360, 75, 25);
+		formToolkit.adapt(SubmitChat, true, true);
+		SubmitChat.setText("Send");
+		
+		Label lblUUIDLabel = formToolkit.createLabel(comp_main, "Your UUID: ", SWT.NONE);
+		lblUUIDLabel.setBounds(624, 364, 95, 15);
+		
+		Label lblUUID = formToolkit.createLabel(comp_main, "empty", SWT.NONE);
+		lblUUID.setText(UUID);
+		lblUUID.setBounds(634, 383, 73, 15);
+		
 		MenuItem mntmMain = new MenuItem(menu, SWT.NONE);
 		mntmMain.setText("Main");
 		
 		MenuItem mntmDebugger = new MenuItem(menu, SWT.NONE);
 		mntmDebugger.setText("Debugger");
+		
+		MenuItem mntmExit = new MenuItem(menu, SWT.NONE);
+		mntmExit.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.exit(0);
+			}
+		});
+		mntmExit.setText("Exit");
 		
 		Composite comp_debugger = new Composite(shlChatV, SWT.NONE);
 		comp_debugger.setLocation(14, 13);
