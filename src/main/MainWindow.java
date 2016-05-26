@@ -32,6 +32,8 @@ public class MainWindow{
 	 */
 	public static void main(String[] args) {
 		
+		dm.setMyUUID(UUID);
+		
 		dm.start();
 
 		window.open();
@@ -59,7 +61,7 @@ public class MainWindow{
 					// TODO Auto-generated method stub
 					if(!dm.debugMessages.isEmpty()){
 						
-						DebugText.append(dm.debugMessages.pop());
+						DebugText.append(dm.debugMessages.poll());
 						//shlChatV.redraw();
 					}
 				}

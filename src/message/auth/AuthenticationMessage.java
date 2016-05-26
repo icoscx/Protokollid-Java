@@ -20,11 +20,11 @@ public class AuthenticationMessage extends Message {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
+	
 	public AuthenticationMessage(byte[] bytes) throws Exception {
 		super(bytes);
 		// TODO Auto-generated constructor stub
 	}
-	*/
+	
 
 }

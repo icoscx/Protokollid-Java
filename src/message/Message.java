@@ -283,10 +283,11 @@ public class Message {
 		
 		return "[" + ft.format(dNow) +"] version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
-				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
-				+ getMessageTotalLength() + "| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
-				"| srcip/port: " + getSourceIP() + ":" + getSourcePort() + "\n";
+				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength=" 
+				+ getMessageTotalLength() + " | " + this.getClass().getName() + "\n";
 	}
+	//| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
+	//"| srcip/port: " + getSourceIP() + ":" + getSourcePort()
 	
 	
 	

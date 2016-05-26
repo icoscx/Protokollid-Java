@@ -16,6 +16,13 @@ public class TextMessageData extends DataMessage {
 		// TODO Auto-generated constructor stub
 			//fixFlag(sequenceNumber, lastFragment);
 	}
+
+	public TextMessageData(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 	
 
 }

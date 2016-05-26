@@ -14,4 +14,11 @@ public class SuccessAuth extends AuthenticationMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public SuccessAuth(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

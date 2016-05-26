@@ -15,4 +15,11 @@ public class SessionData extends DataMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public SessionData(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

@@ -1,6 +1,11 @@
 package main;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import message.Message;
+import message.auth.type.InitializeAuth;
 
 /**
  * 
@@ -14,9 +19,15 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
+
+		List list = new ArrayList<>();
+		//Collections.
+		/***
+		//InitializeAuth ia = (InitializeAuth) new Message("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA".getBytes());
 		
-		
-		
+		Message m1 = new Message("aaaa", "ssss", 1, 2, 1, "1");
+		InitializeAuth ia = new InitializeAuth(m1.getByteData());
+		System.out.println(ia.debugString());*/
 		/**
 		Stack<Message> stack = new Stack<>();
 		

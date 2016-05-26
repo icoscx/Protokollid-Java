@@ -15,4 +15,11 @@ public class RoutingUpdateInitControl extends ControlMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public RoutingUpdateInitControl(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

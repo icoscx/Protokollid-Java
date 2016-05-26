@@ -15,4 +15,11 @@ public class ACKSQ1Control extends ControlMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public ACKSQ1Control(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

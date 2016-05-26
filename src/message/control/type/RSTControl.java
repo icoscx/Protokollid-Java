@@ -14,4 +14,11 @@ public class RSTControl extends ControlMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public RSTControl(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

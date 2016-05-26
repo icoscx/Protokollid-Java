@@ -16,6 +16,13 @@ public class FileData extends DataMessage {
 		// TODO Auto-generated constructor stub
 			//fixFlag(sequenceNumber, lastFragment);
 	}
+
+	public FileData(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 	
 
 

@@ -14,4 +14,11 @@ public class InitializeAuth extends AuthenticationMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public InitializeAuth(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

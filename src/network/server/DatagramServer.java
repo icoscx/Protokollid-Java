@@ -6,9 +6,25 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Stack;
+import java.util.LinkedList;
+import java.util.Queue;
 import message.Message;
+import message.auth.type.InitializeAuth;
+import message.auth.type.SuccessAuth;
+import message.control.type.ACKSQ0Control;
+import message.control.type.ACKSQ1Control;
+import message.control.type.FileTrasnferInitControl;
+import message.control.type.KeepAliveControl;
+import message.control.type.RSTControl;
+import message.control.type.RoutingUpdateInitControl;
+import message.control.type.SessionInitControl;
+import message.data.type.FileData;
+import message.data.type.RoutingData;
+import message.data.type.SessionData;
+import message.data.type.TextMessageData;
+import network.ParsingFunctions;
 
 
 public class DatagramServer extends Thread{
@@ -17,11 +33,11 @@ public class DatagramServer extends Thread{
 	
 	private Thread t;
 	
-	public volatile Stack<Message> receivedPacket = new Stack<Message>();
+	private String myUUID = "";
 	
-	public volatile Stack<Message> forSendingPacket = new Stack<Message>();
+	public volatile Hashtable<String, Message> packetCache = new Hashtable<>();
 	
-	public volatile Stack<String> debugMessages = new Stack<String>();
+	public volatile Queue<String> debugMessages = new LinkedList<String>();
 	
 	/**
 	 * Port to listen. If behind NAT, Port forwarding needs to be configured.
@@ -126,33 +142,41 @@ public class DatagramServer extends Thread{
 					con.requestBuffer.get(bytearr, con.requestBuffer.position(), con.requestBuffer.limit());
 
 					Message aMessage = new Message(bytearr);
+		
+					//System.out.println("\nReceived message: "+ aMessage.debugString());
 					
-					//System.out.println(aMessage.toString());
-					System.out.println("\nReceived message: "+ aMessage.debugString());
+					aMessage = ParsingFunctions.classifyPacket(aMessage);
 					
-					receivedPacket.push(aMessage);
-					debugMessages.push(new String("Received: \n"));
-					debugMessages.push(receivedPacket.peek().debugString());
+					con.setReceivedPacket(aMessage);
+					//receivedPacket.push(aMessage);
+					
+					//debugMessages.push(new String("Received: \n"));
+					//debugMessages.push(con.getReadOnlyReceivedPacket().debugString());
+					
+					debugMessages.add(new String("Received: \n"));
+					debugMessages.add(con.getReadOnlyReceivedPacket().debugString());
+					
 
-					//System.out.println("PEEK: "); 
-					//System.out.println("read fun -> forSendingPacket -> " + forSendingPacket.peek().debugString());
-					
 					con.requestBuffer.clear();
-					//forSendingPacket.push(aMessage);
-					/**
-					 * töötlus siia
-					 */
-					forSendingPacket.push(receivedPacket.pop());
-					//con.responseBuffer.clear();
-					//con.responseBuffer = Charset.forName( "ASCII" ).newEncoder().encode(CharBuffer.wrap("01616161617878787801090F00"));
-					while(!forSendingPacket.empty()){
-						//System.out.println("PEEK: "); 
-						//System.out.println("read fun -> forSendingPacket -> " + forSendingPacket.peek().debugString());
-						debugMessages.push(new String("Sent: \n"));
-						debugMessages.push(forSendingPacket.peek().debugString());
-						con.responseBuffer = ByteBuffer.wrap(forSendingPacket.pop().getByteData());
+
+					//forSendingPacket.push(receivedPacket.pop());
+					
+					aMessage = packetFlow(aMessage);
+					
+					//con.setForSendingPacket(con.getReceivedPacket());
+					con.setForSendingPacket(aMessage);
+
+					while(!con.getForSendingPacketStack().isEmpty()){
+
+						//debugMessages.push(new String("Sent: \n"));
+						//debugMessages.push(con.getReadOnlyForSendingPacket().debugString());
+						
+						debugMessages.add(new String("Sent: \n"));
+						debugMessages.add(con.getReadOnlyForSendingPacket().debugString());
+						
+						con.responseBuffer = ByteBuffer.wrap(con.getForSendingPacket().getByteData());
 						////////////////
-						Thread.sleep(1);
+						//Thread.sleep(1);
 						////////////////
 					}
 
@@ -168,7 +192,132 @@ public class DatagramServer extends Thread{
 		 
     }
 
-    private void write(SelectionKey key){
+    private Message packetFlow(Message msg) {
+		// TODO Auto-generated method stub
+    	
+    	//if dst != me, relay();
+    	
+    	//volitaile: t1 r/w t2 r  //hashtable = sync hashmap = async
+    	
+		try {
+			
+			//String senderUUID = msg.getSource();
+			
+			switch (msg.getType()) {
+			//auth
+			case "04":
+				
+				if(msg.getFlag().equals("01")){
+					InitializeAuth ia = new InitializeAuth(msg.getByteData());
+					return ia;
+				}
+				
+				if(msg.getFlag().equals("02")){
+					SuccessAuth sa = new SuccessAuth(msg.getByteData());
+					return sa;
+				}
+				
+				break;
+			//control
+			case "02":
+				
+				if(msg.getFlag().equals("04")){
+					ACKSQ0Control ia = new ACKSQ0Control(msg.getByteData());
+					return ia;
+				}
+				
+				if(msg.getFlag().equals("06")){
+					ACKSQ1Control sa = new ACKSQ1Control(msg.getByteData());
+					return sa;
+				}
+				
+				if(msg.getFlag().equals("20")){
+					FileTrasnferInitControl sa = new FileTrasnferInitControl(msg.getByteData());
+					return sa;
+				}
+				if(msg.getFlag().equals("08")){
+					KeepAliveControl sa = new KeepAliveControl(msg.getByteData());
+					return sa;
+				}
+				if(msg.getFlag().equals("10")){
+					RoutingUpdateInitControl sa = new RoutingUpdateInitControl(msg.getByteData());
+					return sa;
+				}
+				
+				if(msg.getFlag().equals("01")){
+					RSTControl sa = new RSTControl(msg.getByteData());
+					return sa;
+				}
+				if(msg.getFlag().equals("40")){
+					SessionInitControl sa = new SessionInitControl(msg.getByteData());
+					return sa;
+				}
+				
+				break;
+			//data	
+			case "01":
+				
+				if(msg.getFlag().equals("08")
+				|| msg.getFlag().equals("09")
+				|| msg.getFlag().equals("0A")
+				|| msg.getFlag().equals("0B")
+						){
+					FileData ia = new FileData(msg.getByteData());
+					return ia;
+				}
+				
+				if(msg.getFlag().equals("20")
+				|| msg.getFlag().equals("21")
+				|| msg.getFlag().equals("22")
+				|| msg.getFlag().equals("23")
+						){
+					RoutingData ia = new RoutingData(msg.getByteData());
+					return ia;
+				}
+				
+				if(msg.getFlag().equals("04") //0100
+				|| msg.getFlag().equals("05") //0101
+				|| msg.getFlag().equals("06") //0110
+				|| msg.getFlag().equals("07") //0111
+						){
+					//TextMessageData ia = new TextMessageData(msg.getByteData());
+					packetCache.put(msg.getSource(), msg);
+
+					if(msg.getFlag().equals("04") || msg.getFlag().equals("05")){
+						msg = new ACKSQ0Control(myUUID, msg.getSource());
+					}else if(msg.getFlag().equals("06") || msg.getFlag().equals("07")){
+						msg = new ACKSQ1Control(myUUID, msg.getSource());
+					}
+					
+					return msg;
+				}
+				
+				if(msg.getFlag().equals("10")
+				|| msg.getFlag().equals("11")
+				|| msg.getFlag().equals("12")
+				|| msg.getFlag().equals("13")
+						){
+					SessionData ia = new SessionData(msg.getByteData());
+					return ia;
+				}
+				
+				break;
+				
+
+			default:
+				throw new Exception("ParsingFunctions: Failed to classify packet");
+				//break;
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		return null;
+	}
+
+	private void write(SelectionKey key){
     	
         try {
 			DatagramChannel chan = (DatagramChannel)key.channel();
@@ -187,6 +336,22 @@ public class DatagramServer extends Thread{
 		}
         
     }
+
+	public String getMyUUID() {
+		return myUUID;
+	}
+
+	public void setMyUUID(String myUUID) {
+		this.myUUID = myUUID;
+	}
+	
+	
+	
+	
+
+
+    
+    
 
 
 

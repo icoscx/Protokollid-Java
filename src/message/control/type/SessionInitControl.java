@@ -17,4 +17,11 @@ public class SessionInitControl extends ControlMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public SessionInitControl(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

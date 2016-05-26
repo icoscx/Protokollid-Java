@@ -16,6 +16,13 @@ public class RoutingData extends DataMessage {
 		// TODO Auto-generated constructor stub
 			//fixFlag(sequenceNumber, lastFragment);
 	}
+
+	public RoutingData(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 	
 
 

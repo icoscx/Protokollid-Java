@@ -40,12 +40,12 @@ public class DataMessage extends Message {
 	 * @param bytes
 	 * @throws Exception
 	 */
-	/**
+	
 	public DataMessage(byte[] bytes) throws Exception {
 		super(bytes);
 		// TODO Auto-generated constructor stub
 	}
-	*/
+	
 	/**
 	 * 
 	 * @param sequenceNumber false; true;
@@ -78,21 +78,21 @@ public class DataMessage extends Message {
 	
 	protected static int fixTextMessageFlag(boolean sequenceNumber, boolean lastFragment){
 			
-			if(!sequenceNumber && lastFragment){
-				//0000 0101
-				return 5;
-			}else if(sequenceNumber && lastFragment){
-				//0000 0111
-				return 7;
-			}else if(!sequenceNumber && !lastFragment){
-				//0000 0100
-				return 4;
-			}else if(sequenceNumber && !lastFragment){
-				//0000 0110
-				return 6;
-			}
-			
+		if(!sequenceNumber && lastFragment){
+			//0000 0101
+			return 5;
+		}else if(sequenceNumber && lastFragment){
+			//0000 0111
+			return 7;
+		}else if(!sequenceNumber && !lastFragment){
+			//0000 0100
 			return 4;
+		}else if(sequenceNumber && !lastFragment){
+			//0000 0110
+			return 6;
+		}
+		
+		return 4;
 			
 	}
 	

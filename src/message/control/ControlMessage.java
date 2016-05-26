@@ -19,11 +19,11 @@ public class ControlMessage extends Message {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
+	
 	public ControlMessage(byte[] bytes) throws Exception {
 		super(bytes);
 		// TODO Auto-generated constructor stub
 	}
-	*/
+	
 
 }

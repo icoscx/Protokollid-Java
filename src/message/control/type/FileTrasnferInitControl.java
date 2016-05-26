@@ -15,4 +15,11 @@ public class FileTrasnferInitControl extends ControlMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+	public FileTrasnferInitControl(byte[] bytes) throws Exception {
+		super(bytes);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }
