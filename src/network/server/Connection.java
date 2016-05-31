@@ -2,8 +2,8 @@ package network.server;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import message.Message;
 
@@ -15,9 +15,9 @@ public class Connection {
     public volatile ByteBuffer responseBuffer;
     public volatile SocketAddress socketAddress;
     
-	private volatile Queue<Message> receivedPacket = new LinkedList<Message>();
+	private volatile Queue<Message> receivedPacket = new ConcurrentLinkedQueue<Message>();
 	
-	private volatile Queue<Message> forSendingPacket = new LinkedList<Message>();
+	private volatile Queue<Message> forSendingPacket = new ConcurrentLinkedQueue<Message>();
     
     public Connection(){
     	

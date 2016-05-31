@@ -66,6 +66,16 @@ public class MainWindow{
 					}
 				}
 			});
+			display.asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					if(!dm.packetCache.isEmpty()){
+						ChatWindow.append(dm.packetCache.poll().debugString());
+					}	
+				}
+			});
 		}
 	}
 
@@ -118,12 +128,6 @@ public class MainWindow{
 		mntmDebugger.setText("Debugger");
 		
 		MenuItem mntmExit = new MenuItem(menu, SWT.NONE);
-		mntmExit.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.exit(0);
-			}
-		});
 		mntmExit.setText("Exit");
 		
 		Composite comp_debugger = new Composite(shlChatV, SWT.NONE);
@@ -136,6 +140,13 @@ public class MainWindow{
 		DebugText.setLocation(0, 0);
 		DebugText.setSize(749, 385);
 		formToolkit.adapt(DebugText, true, true);
+		
+		mntmExit.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				System.exit(0);
+			}
+		});
 		
 		mntmDebugger.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -150,6 +161,16 @@ public class MainWindow{
 			public void widgetSelected(SelectionEvent e) {
 				comp_debugger.setVisible(false);
 				comp_main.setVisible(true);
+			}
+		});
+		
+		SubmitChat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(EnterChat.getText().length() > 0){
+				//push it to somewhere
+				//EnterChat.getText()
+				}
 			}
 		});
 

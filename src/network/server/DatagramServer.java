@@ -6,10 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import message.Message;
 import message.auth.type.InitializeAuth;
 import message.auth.type.SuccessAuth;
@@ -23,7 +22,6 @@ import message.control.type.SessionInitControl;
 import message.data.type.FileData;
 import message.data.type.RoutingData;
 import message.data.type.SessionData;
-import message.data.type.TextMessageData;
 import network.ParsingFunctions;
 
 
@@ -35,9 +33,9 @@ public class DatagramServer extends Thread{
 	
 	private String myUUID = "";
 	
-	public volatile Hashtable<String, Message> packetCache = new Hashtable<>();
+	public volatile Queue<Message> packetCache = new ConcurrentLinkedQueue<Message>();
 	
-	public volatile Queue<String> debugMessages = new LinkedList<String>();
+	public volatile Queue<String> debugMessages = new ConcurrentLinkedQueue<String>();
 	
 	/**
 	 * Port to listen. If behind NAT, Port forwarding needs to be configured.
@@ -281,7 +279,8 @@ public class DatagramServer extends Thread{
 				|| msg.getFlag().equals("07") //0111
 						){
 					//TextMessageData ia = new TextMessageData(msg.getByteData());
-					packetCache.put(msg.getSource(), msg);
+					
+					packetCache.add(msg);
 
 					if(msg.getFlag().equals("04") || msg.getFlag().equals("05")){
 						msg = new ACKSQ0Control(myUUID, msg.getSource());

@@ -3,10 +3,7 @@ package network.client;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketAddress;
-
 import message.Message;
-import network.ParsingFunctions;
 import network.NetworkVars;
 
 
