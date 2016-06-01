@@ -5,19 +5,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import message.Message;
 import network.NetworkVars;
+import network.ParsingFunctions;
 
 
 public class DatagramClient {
-	
-	public boolean hasFailed = false;
-	
-	private Message message;
-	
-	public String error = "";
-	
-	public Message send(Message msg){
 
-		this.message = msg;
+	public boolean send(Message msg){
 		
 		try {
 			InetAddress IPAddress = InetAddress.getByName(msg.getDestinationIP());
@@ -32,35 +25,56 @@ public class DatagramClient {
 			DatagramSocket clientSocket = new DatagramSocket();
 			clientSocket.setSoTimeout(NetworkVars.socketTimeOut);
 			clientSocket.send(sendPacket);
-			clientSocket.close();
-			
-			/**
-			
-			//increased size for not crashing
+			//clientSocket.close();
+			//need answer, stop and wait
 			byte[] receiveData = new byte[100];
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			clientSocket.receive(receivePacket);
 			//System.out.println(clientSocket.getLocalPort());
 			clientSocket.close();
 			
-			//????????????????????????????????????
-			if(receiveData.length < 13){
-				throw new Exception("DatagramClient: Packet length shorter than 13 bytes");
-			}
-			this.message = new Message(receivePacket.getData());
-			*/
-			//not needed, reply should only be fixed size
-			//MessageParser mp = new MessageParser();
-			//message = mp.parser(message);
+			String sentType = msg.getType();
+			String sentFlag = msg.getFlag();
 			
-			//return message;
+			msg = ParsingFunctions.classifyPacket(new Message(receivePacket.getData()));
+			
+			if((sentType.equals("02") || sentType.equals("04")) 
+					&& !msg.getFlag().equals("04")){
+				throw new Exception("Wrong response, expecting ACK0 for Control and Auth messages");
+			}else if(sentType.equals("01")){
+				
+				switch (sentFlag) {
+				case value:
+					
+					break;
+				case value:
+					
+					break;
+				case value:
+					
+					break;
+				case value:
+					
+					break;
+
+				default:
+					break;
+				}
+				
+			}
+			
+			
+			//else if(sentType.equals("01") && sentFlag.equals(""))
+			//saan acki tagasi ja õige
+			//if type data, need look for seq
+			//any other type, expect ACK0
 			
 		} catch (Exception e) {
 			// TODO: handle exception
-			this.hasFailed = true;
-			error = e.toString();
+			e.printStackTrace();
+			return false;
 		}
-		return message;
+		return true;
 
 	      
 	}

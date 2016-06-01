@@ -17,6 +17,8 @@ public class Message {
 	
 	private static final int maxExpectedUDPDatagram = 100;
 	
+	private static final int minExpectedUDPDatagram = 13;
+	
 	private static final int currentVersion = 1;
 	
 	private static final int defaultHopCount = 15;
@@ -92,7 +94,11 @@ public class Message {
 		if(bytes.length > maxExpectedUDPDatagram){
 			//logger here needed
 			throw new Exception("Message received more data than expected > " + maxExpectedUDPDatagram);
-			}
+		}
+		if(bytes.length < minExpectedUDPDatagram){
+			//logger here needed
+			throw new Exception("Message received less data than expected < " + minExpectedUDPDatagram);
+		}
 		byteData = trimBytes(bytes);
 		dataHex = createHexString(byteData);
 		splitData();

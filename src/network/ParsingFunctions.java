@@ -17,6 +17,8 @@ import message.data.type.TextMessageData;
 
 public class ParsingFunctions {
 	
+	public static String myUUID = "";
+	
 	/**
 	 * Cast incoming messages to correct type
 	 * @param msg to cast
@@ -25,18 +27,17 @@ public class ParsingFunctions {
 	public static Message classifyPacket(Message msg){
 		
 		try {
+
 			switch (msg.getType()) {
 			
 			case "04":
 				
 				if(msg.getFlag().equals("01")){
-					InitializeAuth ia = new InitializeAuth(msg.getByteData());
-					return ia;
+					return new InitializeAuth(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("02")){
-					SuccessAuth sa = new SuccessAuth(msg.getByteData());
-					return sa;
+					return new SuccessAuth(msg.getByteData());
 				}
 				
 				break;
@@ -44,35 +45,30 @@ public class ParsingFunctions {
 			case "02":
 				
 				if(msg.getFlag().equals("04")){
-					ACKSQ0Control ia = new ACKSQ0Control(msg.getByteData());
-					return ia;
+					return new ACKSQ0Control(msg.getByteData());
+
 				}
 				
 				if(msg.getFlag().equals("06")){
-					ACKSQ1Control sa = new ACKSQ1Control(msg.getByteData());
-					return sa;
+					return new ACKSQ1Control(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("20")){
-					FileTrasnferInitControl sa = new FileTrasnferInitControl(msg.getByteData());
-					return sa;
+					return new FileTrasnferInitControl(msg.getByteData());
 				}
 				if(msg.getFlag().equals("08")){
-					KeepAliveControl sa = new KeepAliveControl(msg.getByteData());
-					return sa;
+					return new KeepAliveControl(msg.getByteData());
 				}
 				if(msg.getFlag().equals("10")){
-					RoutingUpdateInitControl sa = new RoutingUpdateInitControl(msg.getByteData());
-					return sa;
+					return new RoutingUpdateInitControl(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("01")){
-					RSTControl sa = new RSTControl(msg.getByteData());
-					return sa;
+					return new RSTControl(msg.getByteData());
+
 				}
 				if(msg.getFlag().equals("40")){
-					SessionInitControl sa = new SessionInitControl(msg.getByteData());
-					return sa;
+					return new SessionInitControl(msg.getByteData());
 				}
 				
 				break;
@@ -84,8 +80,7 @@ public class ParsingFunctions {
 				|| msg.getFlag().equals("0A")
 				|| msg.getFlag().equals("0B")
 						){
-					FileData ia = new FileData(msg.getByteData());
-					return ia;
+					return new FileData(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("20")
@@ -93,8 +88,7 @@ public class ParsingFunctions {
 				|| msg.getFlag().equals("22")
 				|| msg.getFlag().equals("23")
 						){
-					RoutingData ia = new RoutingData(msg.getByteData());
-					return ia;
+					return new RoutingData(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("04")
@@ -102,8 +96,7 @@ public class ParsingFunctions {
 				|| msg.getFlag().equals("06")
 				|| msg.getFlag().equals("07")
 						){
-					TextMessageData ia = new TextMessageData(msg.getByteData());
-					return ia;
+					return new TextMessageData(msg.getByteData());
 				}
 				
 				if(msg.getFlag().equals("10")
@@ -111,8 +104,7 @@ public class ParsingFunctions {
 				|| msg.getFlag().equals("12")
 				|| msg.getFlag().equals("13")
 						){
-					SessionData ia = new SessionData(msg.getByteData());
-					return ia;
+					return new SessionData(msg.getByteData());
 				}
 				
 				break;
@@ -128,24 +120,121 @@ public class ParsingFunctions {
 			e.printStackTrace();
 		}
 		
-		return msg;
+		return null;
 	}
 	
-	/**
-	 * Remove 00
-	 * @param msg Message to trim
-	 * @return trimmed message, real leangth
-	 */
-	public static Message parser(Message msg){
-		
-		int length = Integer.decode("0x" + msg.getLength());
-		//siai if juurde
-		if(length > 13){
-			msg.setDataHex(msg.getDataHex().substring(0, 26 + length*2));
-			msg.setPayload(msg.getPayload().substring(0, length*2));
+	public static Message packetFlow(Message msg) {
+		// TODO Auto-generated method stub
+    	
+    	//if dst != me, relay();
+    	
+    	//volitaile: t1 r/w t2 r  //hashtable = sync hashmap = async
+    	
+		try {
+			
+			//String senderUUID = msg.getSource();
+			
+			switch (msg.getType()) {
+			//auth
+			case "04":
+				
+				if(msg.getFlag().equals("01")){
+					return new InitializeAuth(msg.getByteData());
+					
+				}
+				
+				if(msg.getFlag().equals("02")){
+					return new SuccessAuth(msg.getByteData());
+				}
+				
+				break;
+			//control
+			case "02":
+				
+				if(msg.getFlag().equals("04")){
+					return new ACKSQ0Control(msg.getByteData());
+				}
+				
+				if(msg.getFlag().equals("06")){
+					return new ACKSQ1Control(msg.getByteData());
+				}
+				
+				if(msg.getFlag().equals("20")){
+					return new FileTrasnferInitControl(msg.getByteData());
+				}
+				if(msg.getFlag().equals("08")){
+					return new KeepAliveControl(msg.getByteData());
+				}
+				if(msg.getFlag().equals("10")){
+					return new RoutingUpdateInitControl(msg.getByteData());
+				}
+				
+				if(msg.getFlag().equals("01")){
+					return new RSTControl(msg.getByteData());
+				}
+				if(msg.getFlag().equals("40")){
+					return new SessionInitControl(msg.getByteData());
+				}
+				
+				break;
+			//data	
+			case "01":
+				
+				if(msg.getFlag().equals("08")
+				|| msg.getFlag().equals("09")
+				|| msg.getFlag().equals("0A")
+				|| msg.getFlag().equals("0B")
+						){
+					return new FileData(msg.getByteData());
+				}
+				
+				if(msg.getFlag().equals("20")
+				|| msg.getFlag().equals("21")
+				|| msg.getFlag().equals("22")
+				|| msg.getFlag().equals("23")
+						){
+					return new RoutingData(msg.getByteData());
+				}
+				
+				if(msg.getFlag().equals("04") //0100
+				|| msg.getFlag().equals("05") //0101
+				|| msg.getFlag().equals("06") //0110
+				|| msg.getFlag().equals("07") //0111
+						){
+					//TextMessageData ia = new TextMessageData(msg.getByteData());
+
+					if(msg.getFlag().equals("04") || msg.getFlag().equals("05")){
+						msg = new ACKSQ0Control(myUUID, msg.getSource());
+					}else if(msg.getFlag().equals("06") || msg.getFlag().equals("07")){
+						msg = new ACKSQ1Control(myUUID, msg.getSource());
+					}
+					
+					return msg;
+				}
+				
+				if(msg.getFlag().equals("10")
+				|| msg.getFlag().equals("11")
+				|| msg.getFlag().equals("12")
+				|| msg.getFlag().equals("13")
+						){
+					return new SessionData(msg.getByteData());
+				}
+				
+				break;
+				
+
+			default:
+				throw new Exception("ParsingFunctions: Packetflow error");
+				//break;
 			}
 
-		return msg;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		return null;
 	}
+
 
 }
