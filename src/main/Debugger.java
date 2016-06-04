@@ -1,11 +1,12 @@
 package main;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import message.Message;
-import message.auth.type.InitializeAuth;
+import message.data.type.TextMessageData;
+import network.ParsingFunctions;
 
 /**
  * 
@@ -19,9 +20,39 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
+		
+		Message msg = new TextMessageData(ParsingFunctions.myUUID, "ssss", 1, "a", true, true);
+		
+		System.out.println(msg.getClass().getSimpleName());
+		
+		
+		/**String data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
-		List list = new ArrayList<>();
+		Queue<String> ll = new LinkedList<String>();
+		 
+		 int numberOfPieces = (data.length() + 86) / 87;
+		 System.out.println("Pieces " + numberOfPieces);
+		 
+		 if(data.length() <= 87){
+			 ll.add(data);
+		 }else{
+		 
+			 for(int i = 0; i<numberOfPieces; i++){
+				 System.out.println("Current i " + i);
+				 if(i == (numberOfPieces - 1)){
+					 ll.add(data.substring(87 * i));
+				 }else{
+					 System.out.println(87 * i + " | " + 87 * (i+1));
+					 ll.add(data.substring(87 * i, 87 * (i+1)));
+				 }
+			 }
+		 }
+		/**
+		System.out.println("s: " + (int) Math.ceil((double)870 / 87));
+		System.out.println("s: " + (870+86)/87);
 		//Collections.
+		 * 
+		 */
 		/***
 		//InitializeAuth ia = (InitializeAuth) new Message("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA".getBytes());
 		

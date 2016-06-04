@@ -11,7 +11,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import network.NetworkCore;
 import network.ParsingFunctions;
+import network.client.DatagramClient;
 import network.server.DatagramServer;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
@@ -23,10 +25,11 @@ public class MainWindow{
 	private Text DebugText;
 	static DatagramServer dm = new DatagramServer(12344);
 	static MainWindow window = new MainWindow();
+	static NetworkCore nc = new NetworkCore();
 	private Text ChatWindow;
 	private Text Users;
 	private Text EnterChat;
-	public static String UUID = "ABCD";
+	public static String UUID = "FAFA";
 	
 	/**
 	 * Launch the application.
@@ -37,6 +40,8 @@ public class MainWindow{
 		ParsingFunctions.myUUID = UUID;
 		
 		dm.start();
+		
+		nc.start();
 
 		window.open();
 
@@ -66,18 +71,24 @@ public class MainWindow{
 						DebugText.append(dm.debugMessages.poll());
 						//shlChatV.redraw();
 					}
+					
+					if(!DatagramClient.debugMessages.isEmpty()){
+						DebugText.append(DatagramClient.debugMessages.poll());
+					}
 				}
 			});
+			
 			display.asyncExec(new Runnable() {
 				
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					if(!dm.packetCache.isEmpty()){
-						ChatWindow.append(dm.packetCache.poll().debugString());
+					if(!nc.receivedChat.isEmpty()){
+						ChatWindow.append(nc.receivedChat.poll());
 					}	
 				}
 			});
+			
 		}
 	}
 
@@ -172,6 +183,7 @@ public class MainWindow{
 				if(EnterChat.getText().length() > 0){
 				//push it to somewhere
 				//EnterChat.getText()
+					nc.sendChat(EnterChat.getText(), "SSSS");
 				}
 			}
 		});

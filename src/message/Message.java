@@ -26,30 +26,22 @@ public class Message {
 	private byte[] byteData;
 	
 	private String dataHex = "";
-	
+	//in hex
 	private String version = "";
-	
+	//in hex
 	private String Source = "";
-	
+	//in hex
 	private String Destination = "";
-	
+	//in hex
 	private String Type = "";
-	
+	//in hex
 	private String Flag = "";
-	
+	//in hex
 	private String hopCount = "";
-	
+	//in hex
 	private String length = "";
-	
+	//in hex
 	private String payload = "";
-	
-	private String sourceIP = "";
-	
-	private int sourcePort = 0;
-	
-	private String destinationIP = "";
-	
-	private int destinationPort = 0;
 	
 	public Message(String Source,
 			String Destination, int Type,
@@ -142,42 +134,14 @@ public class Message {
 	     return bytes;
 	}
 	
+	public String getPayloadDataAscii() throws UnsupportedEncodingException{
+		
+		return new String(hexToBytes(this.payload), "ASCII");
+	}
+	
 	public int getMessageTotalLength(){
 		
 		return dataHex.length()/2;
-	}
-	
-	
-	public int getSourcePort() {
-		return sourcePort;
-	}
-
-	public void setSourcePort(int sourcePort) {
-		this.sourcePort = sourcePort;
-	}
-
-	public String getSourceIP() {
-		return sourceIP;
-	}
-
-	public void setSourceIP(String sourceIP) {
-		this.sourceIP = sourceIP;
-	}
-
-	public String getDestinationIP() {
-		return destinationIP;
-	}
-
-	public void setDestinationIP(String destinationIP) {
-		this.destinationIP = destinationIP;
-	}
-
-	public int getDestinationPort() {
-		return destinationPort;
-	}
-
-	public void setDestinationPort(int destinationPort) {
-		this.destinationPort = destinationPort;
 	}
 
 	public byte[] getByteData() {
@@ -277,8 +241,7 @@ public class Message {
 		return "  \nMessage [ dataHex=" + dataHex + "\n, version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
 				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength= " 
-				+ getMessageTotalLength() + "| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
-				"| srcip/port: " + getSourceIP() + ":" + getSourcePort();
+				+ getMessageTotalLength();
 	}
 	
 	public String debugString(){

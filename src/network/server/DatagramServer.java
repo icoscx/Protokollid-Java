@@ -19,7 +19,7 @@ public class DatagramServer extends Thread{
 	
 	private Thread t;
 	
-	public volatile Queue<Message> packetCache = new ConcurrentLinkedQueue<Message>();
+	public static volatile Queue<Message> packetCache = new ConcurrentLinkedQueue<Message>();
 	
 	public volatile Queue<String> debugMessages = new ConcurrentLinkedQueue<String>();
 	
@@ -70,25 +70,29 @@ public class DatagramServer extends Thread{
                             if (key.isReadable()) {
                             	//System.out.println("*****Key readable, reading...*****");
                                 read(key);
+                                //if relay, continiue here
                                 key.interestOps(SelectionKey.OP_WRITE);
                             } else if (key.isWritable()) {
                             	//System.out.println("*****Key writable, writing...*****");
                                 write(key);
                                 key.interestOps(SelectionKey.OP_READ);
-                            }
+                            }//else thread sleep 1
                         } catch (Exception e) {
                             System.err.println("DatagramServer: key error... " +(e.getMessage()!=null?e.getMessage():""));
                             e.printStackTrace();
+                            System.err.println(e.toString());
                         }
                     }
                 } catch (IOException e) {
                     System.err.println("DatagramServer: selector error... " +(e.getMessage()!=null?e.getMessage():""));
                     e.printStackTrace();
+                    System.err.println(e.toString());
                 }
             }
         } catch (IOException e) {
             System.err.println("(FATAL) DatagramServer: network error: " + (e.getMessage()!=null?e.getMessage():""));
             e.printStackTrace();
+            System.err.println(e.toString());
         }
     }
 
@@ -129,7 +133,7 @@ public class DatagramServer extends Thread{
 		
 					aMessage = ParsingFunctions.classifyPacket(aMessage);
 					
-					debugMessages.add(new String("Received: \n"));
+					debugMessages.add(new String("SRV: Received: \n"));
 					debugMessages.add(aMessage.debugString());
 
 					con.requestBuffer.clear();
@@ -138,7 +142,7 @@ public class DatagramServer extends Thread{
 					
 					aMessage = ParsingFunctions.packetFlow(aMessage);
 					
-					debugMessages.add(new String("Sent: \n"));
+					debugMessages.add(new String("SRV: Sent: \n"));
 					debugMessages.add(aMessage.debugString());
 					
 					con.responseBuffer = ByteBuffer.wrap(aMessage.getByteData());
@@ -163,9 +167,11 @@ public class DatagramServer extends Thread{
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.err.println(e.toString());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.err.println(e.toString());
 			}
 
 		 
@@ -187,6 +193,7 @@ public class DatagramServer extends Thread{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.err.println(e.toString());
 		}
         
     }

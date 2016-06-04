@@ -16,7 +16,7 @@ import message.data.type.SessionData;
 import message.data.type.TextMessageData;
 
 public class ParsingFunctions {
-	
+	//set from main class
 	public static String myUUID = "";
 	
 	/**
@@ -118,6 +118,7 @@ public class ParsingFunctions {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.err.println(e.toString());
 		}
 		
 		return null;
@@ -180,18 +181,18 @@ public class ParsingFunctions {
 			//data	
 			case "01":
 				
-				if(msg.getFlag().equals("08")
-				|| msg.getFlag().equals("09")
-				|| msg.getFlag().equals("0A")
-				|| msg.getFlag().equals("0B")
+				if(msg.getFlag().equals("08") //1000
+				|| msg.getFlag().equals("09") //1001
+				|| msg.getFlag().equals("0A") //1010
+				|| msg.getFlag().equals("0B") //1011
 						){
 					return new FileData(msg.getByteData());
 				}
 				
-				if(msg.getFlag().equals("20")
-				|| msg.getFlag().equals("21")
-				|| msg.getFlag().equals("22")
-				|| msg.getFlag().equals("23")
+				if(msg.getFlag().equals("20")//0010 0000
+				|| msg.getFlag().equals("21")//0010 0001
+				|| msg.getFlag().equals("22")//0010 0010
+				|| msg.getFlag().equals("23")//0010 0011
 						){
 					return new RoutingData(msg.getByteData());
 				}
@@ -204,18 +205,22 @@ public class ParsingFunctions {
 					//TextMessageData ia = new TextMessageData(msg.getByteData());
 
 					if(msg.getFlag().equals("04") || msg.getFlag().equals("05")){
-						msg = new ACKSQ0Control(myUUID, msg.getSource());
+						String s = msg.getSource();
+						msg = new ACKSQ0Control(myUUID, "AAAA");
+						msg.setDestination(s);
 					}else if(msg.getFlag().equals("06") || msg.getFlag().equals("07")){
-						msg = new ACKSQ1Control(myUUID, msg.getSource());
+						String s = msg.getSource();
+						msg = new ACKSQ1Control(myUUID, "AAAA");
+						msg.setDestination(s);
 					}
 					
 					return msg;
 				}
 				
-				if(msg.getFlag().equals("10")
-				|| msg.getFlag().equals("11")
-				|| msg.getFlag().equals("12")
-				|| msg.getFlag().equals("13")
+				if(msg.getFlag().equals("10") //0001 0000
+				|| msg.getFlag().equals("11") //0001 0001
+				|| msg.getFlag().equals("12") //0001 0010
+				|| msg.getFlag().equals("13") //0001 0011
 						){
 					return new SessionData(msg.getByteData());
 				}
@@ -231,6 +236,7 @@ public class ParsingFunctions {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.err.println(e.toString());
 		}
     	
 		return null;
