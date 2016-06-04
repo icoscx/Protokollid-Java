@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import main.MainWindow;
 import message.Message;
 import network.NetworkVars;
 import network.ParsingFunctions;
@@ -27,7 +28,7 @@ public class DatagramClient {
 		this.ip = IP;
 	}
 
-	public boolean send(Message msg){
+	public void send(Message msg){
 		
 		try {
 			InetAddress IPAddress = InetAddress.getByName(this.ip);
@@ -36,7 +37,7 @@ public class DatagramClient {
 			if(msg.getMessageTotalLength() != sendData.length){
 					throw new Exception("Calculated message data does not match real length of byte array to be sent");
 			}
-			debugMessages.add(new String("Client: Sending: \n"));
+			debugMessages.add(new String("Client: Sending: "));
 			debugMessages.add(msg.debugString());
 			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, this.port);
 			//DatagramSocket clientSocket = new DatagramSocket(NetworkVars.sendingPort);
@@ -85,19 +86,16 @@ public class DatagramClient {
 				
 			}
 			
-			debugMessages.add(new String("Client: Received: \n"));
+			debugMessages.add(new String("Client: Received: "));
 			debugMessages.add(msg.debugString());
 
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			System.err.println(e.toString());
-			return false;
+			MainWindow.throwQueue.add(e.toString());
 		}
-		return true;
-
-	      
+    
 	}
 	
 

@@ -20,10 +20,20 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
-		
-		Message msg = new TextMessageData(ParsingFunctions.myUUID, "ssss", 1, "a", true, true);
-		
-		System.out.println(msg.getClass().getSimpleName());
+		Queue<String> ll = new LinkedList<>();
+		ll.add("s");ll.add("s");ll.add("s");
+		while(true){
+			try {
+
+				ll.poll();
+				if(ll.isEmpty()){ throw new Exception("empty");}
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Thread.sleep(3000);
+		}
 		
 		
 		/**String data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";

@@ -3,6 +3,12 @@ package main;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Menu;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Composite;
@@ -30,6 +36,7 @@ public class MainWindow{
 	private Text Users;
 	private Text EnterChat;
 	public static String UUID = "FAFA";
+	public static volatile Queue<String> throwQueue = new ConcurrentLinkedQueue<String>();
 	
 	/**
 	 * Launch the application.
@@ -67,13 +74,15 @@ public class MainWindow{
 				public void run() {
 					// TODO Auto-generated method stub
 					if(!dm.debugMessages.isEmpty()){
-						
-						DebugText.append(dm.debugMessages.poll());
-						//shlChatV.redraw();
+						DebugText.append(dm.debugMessages.poll() + "\n");
 					}
 					
 					if(!DatagramClient.debugMessages.isEmpty()){
-						DebugText.append(DatagramClient.debugMessages.poll());
+						DebugText.append(DatagramClient.debugMessages.poll() + "\n");
+					}
+					
+					if(!throwQueue.isEmpty()){
+						DebugText.append(throwQueue.poll() + "\n");
 					}
 				}
 			});
@@ -84,7 +93,10 @@ public class MainWindow{
 				public void run() {
 					// TODO Auto-generated method stub
 					if(!nc.receivedChat.isEmpty()){
-						ChatWindow.append(nc.receivedChat.poll());
+						Date dNow = new Date( );
+					    SimpleDateFormat ft = 
+					    new SimpleDateFormat ("dd.MM HH:mm:ss:SSS");  
+						ChatWindow.append("[ "+ ft.format(dNow) + " ] UIDfrom: " + nc.receivedChat.poll() + "\n");
 					}	
 				}
 			});
@@ -184,6 +196,11 @@ public class MainWindow{
 				//push it to somewhere
 				//EnterChat.getText()
 					nc.sendChat(EnterChat.getText(), "SSSS");
+					Date dNow = new Date( );
+				    SimpleDateFormat ft = 
+				    new SimpleDateFormat ("dd.MM HH:mm:ss:SSS");  
+					ChatWindow.append("[ "+ ft.format(dNow) +" ] Me: " + EnterChat.getText() + "\n");
+					EnterChat.setText("");
 				}
 			}
 		});

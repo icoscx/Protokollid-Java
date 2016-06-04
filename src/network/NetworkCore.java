@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import main.MainWindow;
 import message.Message;
 import message.data.type.TextMessageData;
 import network.client.DatagramClient;
@@ -42,44 +43,49 @@ public class NetworkCore extends Thread{
 			
 			while(true){
 				
-				while(!clientDataToSend.isEmpty()){
+				try {
 					
-					//todo
-					//from some UUID db find IP+port to send to
+					while(!clientDataToSend.isEmpty()){
+						
+						//todo
+						//from some UUID db find IP+port to send to
+						
+						DatagramClient dc = new DatagramClient("172.16.5.240", 12344);
+						dc.send(clientDataToSend.poll());
+						
+					}
 					
-					DatagramClient dc = new DatagramClient("172.16.5.240", 12344);
-					dc.send(clientDataToSend.poll());
-					
-				}
-				
-				while(!DatagramServer.packetCache.isEmpty()){
-					
-					//need check for FROM
-					//chating has no init, if is chat message start building
-					//start building until last segment true
-					if(DatagramServer.packetCache.peek().getClass().getSimpleName().equals("TextMessageData")){
-						//05 //0101  //07 //0111
-						if(!(DatagramServer.packetCache.peek().getFlag().equals("05") || DatagramServer.packetCache.peek().getFlag().equals("07"))){
-							collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
-						}else{
-							collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
-							receivedChat.add(collectable);
-							collectable = "";
+					while(!DatagramServer.packetCache.isEmpty()){
+						
+						//need check for FROM
+						//chating has no init, if is chat message start building
+						//start building until last segment true
+						if(DatagramServer.packetCache.peek().getClass().getSimpleName().equals("TextMessageData")){
+							//05 //0101  //07 //0111
+							if(!(DatagramServer.packetCache.peek().getFlag().equals("05") || DatagramServer.packetCache.peek().getFlag().equals("07"))){
+								collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
+							}else{
+								collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
+								receivedChat.add(collectable);
+								collectable = "";
+							}
 						}
 					}
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					MainWindow.throwQueue.add("Core error, starting new cycle");
+					e.printStackTrace();
+					MainWindow.throwQueue.add(e.toString());
 				}
-				
 				//Thread.sleep(1);
-				
-			}
+			} //end while true
 			
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.err.println("FATAL: Core died");
+			MainWindow.throwQueue.add("FATAL: Core died, restart program");
 			e.printStackTrace();
-			theCore();
-		}finally {
-			System.err.println("FATAL: Core died, save failed");
+			MainWindow.throwQueue.add(e.toString());
 		}
 		 
 	 }
@@ -113,11 +119,11 @@ public class NetworkCore extends Thread{
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println(e.toString());
+			MainWindow.throwQueue.add(e.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println(e.toString());
+			MainWindow.throwQueue.add(e.toString());
 		}
 		 
 	 }

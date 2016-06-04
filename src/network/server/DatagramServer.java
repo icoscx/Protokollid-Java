@@ -9,6 +9,8 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import main.MainWindow;
 import message.Message;
 import network.ParsingFunctions;
 
@@ -53,7 +55,9 @@ public class DatagramServer extends Thread{
             channel.configureBlocking(false);
             SelectionKey clientKey = channel.register(selector, SelectionKey.OP_READ);
             clientKey.attach(new Connection());
+            
             while (true) {
+            	
                 try {
                     selector.select();
                     Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
@@ -63,7 +67,7 @@ public class DatagramServer extends Thread{
                             selectedKeys.remove();
 
                             if (!key.isValid()) {
-                            	System.out.println("*****Key not valid, re-do*****");
+                            	MainWindow.throwQueue.add("Key not valid in selector, selecting new");
                                 continue;
                             }
 
@@ -78,21 +82,23 @@ public class DatagramServer extends Thread{
                                 key.interestOps(SelectionKey.OP_READ);
                             }//else thread sleep 1
                         } catch (Exception e) {
-                            System.err.println("DatagramServer: key error... " +(e.getMessage()!=null?e.getMessage():""));
+                        	MainWindow.throwQueue.add("DatagramServer: key error... " +(e.getMessage()!=null?e.getMessage():""));
                             e.printStackTrace();
-                            System.err.println(e.toString());
+                            MainWindow.throwQueue.add(e.toString());
                         }
                     }
                 } catch (IOException e) {
-                    System.err.println("DatagramServer: selector error... " +(e.getMessage()!=null?e.getMessage():""));
+                	MainWindow.throwQueue.add("DatagramServer: selector error... " +(e.getMessage()!=null?e.getMessage():""));
                     e.printStackTrace();
-                    System.err.println(e.toString());
+                    MainWindow.throwQueue.add(e.toString());
                 }
-            }
+                
+            }//end while true
+            
         } catch (IOException e) {
-            System.err.println("(FATAL) DatagramServer: network error: " + (e.getMessage()!=null?e.getMessage():""));
+        	MainWindow.throwQueue.add("(FATAL) DatagramServer: network error: " + (e.getMessage()!=null?e.getMessage():""));
             e.printStackTrace();
-            System.err.println(e.toString());
+            MainWindow.throwQueue.add(e.toString());
         }
     }
 
@@ -109,12 +115,12 @@ public class DatagramServer extends Thread{
 				if(currentPosition < 13){
 					
 					con.requestBuffer.clear();
-					System.err.println("DatagramClient: Packet length shorter than 13 bytes");
+					throw new Exception("DatagramServer: Packet length shorter than 13 bytes");
 					
 				}else if(currentPosition > 100){
 					
 					con.requestBuffer.clear();
-					System.err.println("DatagramClient: Packet length larger than 100 bytes");
+					throw new Exception("DatagramServer: Packet length larger than 100 bytes");
 					
 				}else{
 
@@ -133,7 +139,7 @@ public class DatagramServer extends Thread{
 		
 					aMessage = ParsingFunctions.classifyPacket(aMessage);
 					
-					debugMessages.add(new String("SRV: Received: \n"));
+					debugMessages.add(new String("SRV: Received: "));
 					debugMessages.add(aMessage.debugString());
 
 					con.requestBuffer.clear();
@@ -142,36 +148,20 @@ public class DatagramServer extends Thread{
 					
 					aMessage = ParsingFunctions.packetFlow(aMessage);
 					
-					debugMessages.add(new String("SRV: Sent: \n"));
+					debugMessages.add(new String("SRV: Sent: "));
 					debugMessages.add(aMessage.debugString());
 					
 					con.responseBuffer = ByteBuffer.wrap(aMessage.getByteData());
-
-					/**
-					while(!con.getForSendingPacketStack().isEmpty()){
-
-						//debugMessages.push(new String("Sent: \n"));
-						//debugMessages.push(con.getReadOnlyForSendingPacket().debugString());
-						
-						debugMessages.add(new String("Sent: \n"));
-						debugMessages.add(con.getReadOnlyForSendingPacket().debugString());
-						
-						con.responseBuffer = ByteBuffer.wrap(con.getForSendingPacket().getByteData());
-						////////////////
-						//Thread.sleep(1);
-						////////////////
-					}
-					*/
 
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.err.println(e.toString());
+				MainWindow.throwQueue.add(e.toString());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.err.println(e.toString());
+				MainWindow.throwQueue.add(e.toString());
 			}
 
 		 
@@ -193,7 +183,7 @@ public class DatagramServer extends Thread{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println(e.toString());
+			MainWindow.throwQueue.add(e.toString());
 		}
         
     }

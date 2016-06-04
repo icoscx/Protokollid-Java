@@ -1,5 +1,6 @@
 package network;
 
+import main.MainWindow;
 import message.Message;
 import message.auth.type.InitializeAuth;
 import message.auth.type.SuccessAuth;
@@ -118,7 +119,7 @@ public class ParsingFunctions {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println(e.toString());
+			MainWindow.throwQueue.add(e.toString());
 		}
 		
 		return null;
@@ -129,7 +130,7 @@ public class ParsingFunctions {
     	
     	//if dst != me, relay();
     	
-    	//volitaile: t1 r/w t2 r  //hashtable = sync hashmap = async
+    	//volitaile: t1 r/w t2 r 
     	
 		try {
 			
@@ -236,9 +237,9 @@ public class ParsingFunctions {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println(e.toString());
+			MainWindow.throwQueue.add(e.toString());
 		}
-    	
+    	//never arrives here
 		return null;
 	}
 
