@@ -42,7 +42,17 @@ public class Message {
 	private String length = "";
 	//in hex
 	private String payload = "";
-	
+	/**
+	 * SOURCE AND DESTINATION ARE ALREADY IN HEX
+	 * @param Source HEX string in length of 8
+	 * @param Destination HEX string in length of 8
+	 * @param Type integer
+	 * @param Flag integer
+	 * @param length integer
+	 * @param payload normal string to be converted to HEX
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 */
 	public Message(String Source,
 			String Destination, int Type,
 			int Flag,
@@ -53,15 +63,17 @@ public class Message {
 			throw new Exception("Maximum size for integer is 255 > FF");
 		}
 		
-		if(Source.length() > 4 || Destination.length() > 4){
-			throw new Exception("Maximum size for string is 4 characters");
+		if(!(Source.length() == 8) || !(Destination.length() == 8)){
+			throw new Exception("String has to be 8 HEX characters");
 		}
 		
 		if(payload.length() > 87){throw new Exception("Maximum size for paylaod is 87 characters");}
 		
 		this.version = Integer.toHexString(0x100 | currentVersion).substring(1).toUpperCase();
-		this.Source = createHexString(Source.getBytes("ASCII"));
-		this.Destination = createHexString(Destination.getBytes("ASCII"));
+		//this.Source = createHexString(Source.getBytes("ASCII"));
+		//this.Destination = createHexString(Destination.getBytes("ASCII"));
+		this.Source = Source;
+		this.Destination = Destination;
 		this.Type = Integer.toHexString(0x100 | Type).substring(1).toUpperCase();
 		this.Flag = Integer.toHexString(0x100 | Flag).substring(1).toUpperCase();
 		this.hopCount = Integer.toHexString(0x100 | defaultHopCount).substring(1).toUpperCase();
@@ -253,7 +265,7 @@ public class Message {
 		return "[" + ft.format(dNow) +"] version=" + version
 				+ ", Source=" + Source + ", Destination=" + Destination + ", Type=" + Type + ", Flag=" + Flag
 				+ ", hopCount=" + hopCount + ", length=" + length + ", payload=" + payload + "] Tlength=" 
-				+ getMessageTotalLength() + " | " + this.getClass().getName() + "\n";
+				+ getMessageTotalLength() + " | " + this.getClass().getName();
 	}
 	//| dstip/port: " + getDestinationIP() + ":" + getDestinationPort() +
 	//"| srcip/port: " + getSourceIP() + ":" + getSourcePort()

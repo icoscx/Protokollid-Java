@@ -1,14 +1,19 @@
 package network;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import lw.bouncycastle.util.encoders.Base64;
 import main.MainWindow;
 import message.Message;
 import message.data.type.TextMessageData;
 import network.client.DatagramClient;
+import network.peering.Neighbour;
+import network.peering.Router;
 import network.server.DatagramServer;
 
 //collect from threads SRV and client, reassemble, dissassemble
@@ -18,6 +23,10 @@ public class NetworkCore extends Thread{
 	private Thread t;
 	
 	public NetworkCore(){}
+	
+	//public static volatile Queue<Message> authSequene = new ConcurrentLinkedQueue<Message>();
+	
+	//public static boolean authSequenceComplete = false;
 	
 	public volatile Queue<Message> clientDataToSend = new ConcurrentLinkedQueue<Message>();
 	
@@ -44,15 +53,36 @@ public class NetworkCore extends Thread{
 			while(true){
 				
 				try {
+					/**
+					while(!authSequene.isEmpty()){
+						
+						DatagramClient dc = new DatagramClient(authSequenceIP, authSequencePort);
+						String uuid = authSequene.peek().getDestination();
+						authSequenceComplete = dc.send(authSequene.poll());
+						if(!authSequenceComplete){
+							//del neighbour
+						}else{
+							//add route
+						}
+					}
+					*/
 					
 					while(!clientDataToSend.isEmpty()){
 						
 						//todo
 						//from some UUID db find IP+port to send to
 						
-						DatagramClient dc = new DatagramClient("172.16.5.240", 12344);
-						dc.send(clientDataToSend.poll());
-						
+						for (Neighbour n : Router.neighbourTable) {
+							
+							if(n.getUUID().equals(clientDataToSend.peek().getDestination())){
+								
+								//System.out.println("uid from table: " + n.getUUID() + " uid from clientdatatosend: " + clientDataToSend.peek().getDestination());
+								
+								DatagramClient dc = new DatagramClient(n.getIP(), n.getPort());
+								dc.send(clientDataToSend.poll());
+								
+							}
+						}
 					}
 					
 					while(!DatagramServer.packetCache.isEmpty()){
@@ -65,11 +95,15 @@ public class NetworkCore extends Thread{
 							if(!(DatagramServer.packetCache.peek().getFlag().equals("05") || DatagramServer.packetCache.peek().getFlag().equals("07"))){
 								collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
 							}else{
+								MainWindow.lastChatFrom = DatagramServer.packetCache.peek().getSource();
 								collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
 								receivedChat.add(collectable);
 								collectable = "";
 							}
 						}
+						
+						//not recognized packet, throw away
+						DatagramServer.packetCache.poll();
 					}
 					
 				} catch (Exception e) {
@@ -78,7 +112,9 @@ public class NetworkCore extends Thread{
 					e.printStackTrace();
 					MainWindow.throwQueue.add(e.toString());
 				}
-				//Thread.sleep(1);
+				
+				Thread.sleep(1);
+				
 			} //end while true
 			
 		} catch (Exception e) {
@@ -89,7 +125,11 @@ public class NetworkCore extends Thread{
 		}
 		 
 	 }
-	 
+	 /**
+	  * 
+	  * @param data string to send
+	  * @param Destination to whom in HEX id (8)
+	  */
 	 public void sendChat(String data, String Destination){
 		  
 		 try {
@@ -126,6 +166,34 @@ public class NetworkCore extends Thread{
 			MainWindow.throwQueue.add(e.toString());
 		}
 		 
+	 }
+	 
+	 public void sendFile(String fname, String destination){
+
+        try {
+			
+			try {
+				File file = new File("files/" + fname);
+			    FileInputStream is = new FileInputStream(file);
+			    byte[] chunk = new byte[1024];
+			    int chunkLen = 0;
+			    while ((chunkLen = is.read(chunk)) != -1) {
+			        // your code..
+			    }
+			    //encodedBase64 = new String(Base64.encode(bytes));
+			} catch (Exception e) {
+			    e.printStackTrace();
+			    MainWindow.throwQueue.add(e.toString());
+			}
+			
+			Queue<String> pieces = dissassemble(encodedBase64);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			MainWindow.throwQueue.add(e.toString());
+		}
+	 
 	 }
 	 
 	 private Queue<String> dissassemble(String data){

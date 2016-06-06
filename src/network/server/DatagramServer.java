@@ -29,12 +29,7 @@ public class DatagramServer extends Thread{
 	 * Port to listen. If behind NAT, Port forwarding needs to be configured.
 	 * @param ListenPort
 	 */
-	public DatagramServer(int ListenPort){
-		
-		//process(ListenPort);
-		this.port = ListenPort;
-
-	}
+	public DatagramServer(){}
 	
 	 public void start(){
 	     if (t == null)
@@ -80,19 +75,20 @@ public class DatagramServer extends Thread{
                             	//System.out.println("*****Key writable, writing...*****");
                                 write(key);
                                 key.interestOps(SelectionKey.OP_READ);
-                            }//else thread sleep 1
+                            }
                         } catch (Exception e) {
                         	MainWindow.throwQueue.add("DatagramServer: key error... " +(e.getMessage()!=null?e.getMessage():""));
                             e.printStackTrace();
                             MainWindow.throwQueue.add(e.toString());
                         }
                     }
-                } catch (IOException e) {
+                    Thread.sleep(1);
+                } catch (Exception e) {
                 	MainWindow.throwQueue.add("DatagramServer: selector error... " +(e.getMessage()!=null?e.getMessage():""));
                     e.printStackTrace();
                     MainWindow.throwQueue.add(e.toString());
                 }
-                
+
             }//end while true
             
         } catch (IOException e) {
@@ -187,6 +183,16 @@ public class DatagramServer extends Thread{
 		}
         
     }
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+	
+	
 	
 
 

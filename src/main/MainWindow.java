@@ -4,7 +4,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Menu;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,47 +20,72 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.ini4j.Ini;
 
 import network.NetworkCore;
 import network.ParsingFunctions;
 import network.client.DatagramClient;
+import network.peering.Neighbour;
+import network.peering.Router;
 import network.server.DatagramServer;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
-
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.ProgressBar;
+/**
+ * 
+ * @author ivo.pure karl.mendelman kristjan.room
+ *
+ */
 public class MainWindow{
 
 	protected Shell shlChatV;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Text DebugText;
-	static DatagramServer dm = new DatagramServer(12344);
+	private Text ChatWindow;
+	private Text EnterChat;
+	public static volatile Queue<String> throwQueue = new ConcurrentLinkedQueue<String>();
+	static DatagramServer dm = new DatagramServer();
 	static MainWindow window = new MainWindow();
 	static NetworkCore nc = new NetworkCore();
-	private Text ChatWindow;
-	private Text Users;
-	private Text EnterChat;
-	public static String UUID = "FAFA";
-	public static volatile Queue<String> throwQueue = new ConcurrentLinkedQueue<String>();
+	static Router router = new Router();
+	private Text IP;
+	private Text port;
+	private Text uuidToAdd;
+	private List UserList;
+	private int realCountInNTable = 0;
+	public static String lastChatFrom = "";
+	private Text fileInput;
 	
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		
-		ParsingFunctions.myUUID = UUID;
+		boolean configLoaded = false;
 		
-		dm.start();
+		int port = 0;
 		
-		nc.start();
-
-		window.open();
+		String myUID = "";
+		
+		try {
+			Ini ini = new Ini(new File("config.ini"));
+			port = Integer.valueOf(ini.get("config", "listeningport"));
+			myUID = ini.get("config", "myuid");
+			configLoaded = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
+		if(configLoaded){
+		
+			ParsingFunctions.myUUID = myUID;
+			dm.setPort(port);
+			dm.start();	
+			nc.start();
+			router.start();
+			window.open();
+		}
 
 	}
-	/**
-	 * Open the window.
-	 * @return 
-	 */
+	
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
@@ -95,9 +124,33 @@ public class MainWindow{
 					if(!nc.receivedChat.isEmpty()){
 						Date dNow = new Date( );
 					    SimpleDateFormat ft = 
-					    new SimpleDateFormat ("dd.MM HH:mm:ss:SSS");  
-						ChatWindow.append("[ "+ ft.format(dNow) + " ] UIDfrom: " + nc.receivedChat.poll() + "\n");
+					    new SimpleDateFormat ("HH:mm:ss");  
+						throwQueue.add("[ "+ ft.format(dNow) + " ] " + lastChatFrom + ": " + nc.receivedChat.poll() + "\n");
 					}	
+				}
+			});
+			
+			display.asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					ArrayList<String> currentList = new ArrayList<String>(Arrays.asList(UserList.getItems()));
+					
+					if(realCountInNTable != currentList.size()){
+						UserList.removeAll();
+					}
+					
+					realCountInNTable = 0;
+					
+					for (Neighbour n : Router.neighbourTable) {
+						
+						realCountInNTable++;
+						
+						if(!currentList.contains(n.getUUID())){
+							UserList.add(n.getUUID());
+						}
+					}
 				}
 			});
 			
@@ -106,11 +159,12 @@ public class MainWindow{
 
 	/**
 	 * Create contents of the window.
+	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents() {
 		shlChatV = new Shell();
 		shlChatV.setSize(799, 477);
-		shlChatV.setText("Chat v0.1");
+		shlChatV.setText("Chat v0.1.34a");
 		
 		Menu menu = new Menu(shlChatV, SWT.BAR);
 		shlChatV.setMenuBar(menu);
@@ -122,29 +176,88 @@ public class MainWindow{
 		
 		ChatWindow = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		ChatWindow.setEditable(false);
-		ChatWindow.setBounds(10, 10, 584, 343);
+		ChatWindow.setBounds(10, 10, 584, 308);
 		formToolkit.adapt(ChatWindow, true, true);
 		
-		Users = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		Users.setEditable(false);
-		Users.setBounds(602, 36, 131, 290);
-		formToolkit.adapt(Users, true, true);
-		
 		EnterChat = new Text(comp_main, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		EnterChat.setBounds(22, 364, 515, 21);
+		EnterChat.setBounds(20, 328, 515, 21);
 		formToolkit.adapt(EnterChat, true, true);
 		
 		Button SubmitChat = new Button(comp_main, SWT.NONE);
-		SubmitChat.setBounds(543, 360, 75, 25);
+		SubmitChat.setBounds(541, 324, 75, 25);
 		formToolkit.adapt(SubmitChat, true, true);
 		SubmitChat.setText("Send");
 		
 		Label lblUUIDLabel = formToolkit.createLabel(comp_main, "Your UUID: ", SWT.NONE);
-		lblUUIDLabel.setBounds(624, 364, 95, 15);
+		lblUUIDLabel.setBounds(600, 13, 61, 15);
 		
 		Label lblUUID = formToolkit.createLabel(comp_main, "empty", SWT.NONE);
-		lblUUID.setText(UUID);
-		lblUUID.setBounds(634, 383, 73, 15);
+		lblUUID.setText(ParsingFunctions.myUUID);
+		lblUUID.setBounds(663, 13, 73, 15);
+		
+		UserList = new List(comp_main, SWT.BORDER);
+		UserList.setBounds(600, 51, 136, 267);
+		formToolkit.adapt(UserList, true, true);
+		
+		Label lblAboveUsers = new Label(comp_main, SWT.NONE);
+		lblAboveUsers.setBounds(600, 30, 136, 15);
+		formToolkit.adapt(lblAboveUsers, true, true);
+		lblAboveUsers.setText("Select User to chat WITH");
+		
+		IP = new Text(comp_main, SWT.BORDER);
+		IP.setText("0.0.0.0");
+		IP.setBounds(127, 355, 86, 21);
+		formToolkit.adapt(IP, true, true);
+		
+		Label lblIpportToAdd = new Label(comp_main, SWT.NONE);
+		lblIpportToAdd.setBounds(30, 358, 80, 15);
+		formToolkit.adapt(lblIpportToAdd, true, true);
+		lblIpportToAdd.setText("IP/port to add:");
+		
+		port = new Text(comp_main, SWT.BORDER);
+		port.setText("12554");
+		port.setBounds(219, 355, 50, 21);
+		formToolkit.adapt(port, true, true);
+		
+		Button btnAddNeighbour = new Button(comp_main, SWT.NONE);
+		btnAddNeighbour.setBounds(356, 355, 107, 21);
+		formToolkit.adapt(btnAddNeighbour, true, true);
+		btnAddNeighbour.setText("Add Neighbour");
+		
+		uuidToAdd = new Text(comp_main, SWT.BORDER);
+		uuidToAdd.setText("FFFFFFFF");
+		uuidToAdd.setBounds(281, 355, 69, 21);
+		formToolkit.adapt(uuidToAdd, true, true);
+		
+		ProgressBar progressBar = new ProgressBar(comp_main, SWT.NONE);
+		progressBar.setBounds(93, 383, 442, 17);
+		formToolkit.adapt(progressBar, true, true);
+		
+		Label lblTransferFile = new Label(comp_main, SWT.NONE);
+		lblTransferFile.setBounds(10, 383, 77, 15);
+		formToolkit.adapt(lblTransferFile, true, true);
+		lblTransferFile.setText("Transfer file");
+		
+		fileInput = new Text(comp_main, SWT.BORDER);
+		fileInput.setText("file.exe");
+		fileInput.setBounds(541, 383, 145, 21);
+		formToolkit.adapt(fileInput, true, true);
+		
+		Label lblFilenameAndExt = new Label(comp_main, SWT.NONE);
+		lblFilenameAndExt.setBounds(541, 358, 145, 15);
+		formToolkit.adapt(lblFilenameAndExt, true, true);
+		lblFilenameAndExt.setText("FileName and extension:");
+		
+		Button btnSendFile = new Button(comp_main, SWT.NONE);
+		btnSendFile.setBounds(690, 379, 75, 25);
+		formToolkit.adapt(btnSendFile, true, true);
+		btnSendFile.setText("Send File");
+		
+		Button btnSendALL = new Button(comp_main, SWT.NONE);
+		btnSendALL.setBounds(639, 324, 75, 25);
+		formToolkit.adapt(btnSendALL, true, true);
+		btnSendALL.setText("Send to ALL");
+		
 		
 		MenuItem mntmMain = new MenuItem(menu, SWT.NONE);
 		mntmMain.setText("Main");
@@ -156,15 +269,54 @@ public class MainWindow{
 		mntmExit.setText("Exit");
 		
 		Composite comp_debugger = new Composite(shlChatV, SWT.NONE);
-		comp_debugger.setLocation(14, 13);
-		comp_debugger.setSize(759, 395);
+		comp_debugger.setLocation(0, 0);
+		comp_debugger.setSize(569, 309);
 		comp_debugger.setLayout(null);
 		
 		DebugText = new Text(comp_debugger, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		DebugText.setEditable(false);
 		DebugText.setLocation(0, 0);
-		DebugText.setSize(749, 385);
+		DebugText.setSize(559, 299);
 		formToolkit.adapt(DebugText, true, true);
+		
+		btnAddNeighbour.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Date dNow = new Date( );
+			    SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss");
+				try {
+					if(uuidToAdd.getText().toUpperCase().equals(ParsingFunctions.myUUID)){
+						throw new Exception("Cannot add yourself");
+					}
+					
+					if(!(IP.getText().matches("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$"))){
+						throw new Exception("wrong ip address format ("+IP.getText()+")");
+					}
+					
+					if(!(Integer.valueOf(port.getText()) > 1024) && (Integer.valueOf(port.getText()) < 65535)){
+						throw new Exception("port not acceptable ("+port.getText()+")!");
+					}
+					
+					for (Neighbour n : Router.neighbourTable) {
+						if(n.getUUID().toUpperCase().equals(uuidToAdd.getText().toUpperCase())){
+							throw new Exception("Dublicate entry");
+						}
+					}
+
+					Router.neighbourTable.add(new Neighbour(uuidToAdd.getText(), IP.getText(), Integer.valueOf(port.getText())));
+					
+					
+				} catch (Exception ex1) {
+					// TODO Auto-generated catch block
+					ex1.printStackTrace();
+					MainWindow.throwQueue.add(ex1.toString());
+					ChatWindow.append("[ "+ ft.format(dNow) +" ] SYSTEM: " + ex1.toString() + "\n");
+				}
+				IP.setText("");
+				port.setText("");
+				uuidToAdd.setText("");
+			}
+		});
 		
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -193,15 +345,34 @@ public class MainWindow{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if(EnterChat.getText().length() > 0){
-				//push it to somewhere
-				//EnterChat.getText()
-					nc.sendChat(EnterChat.getText(), "SSSS");
+					
 					Date dNow = new Date( );
-				    SimpleDateFormat ft = 
-				    new SimpleDateFormat ("dd.MM HH:mm:ss:SSS");  
-					ChatWindow.append("[ "+ ft.format(dNow) +" ] Me: " + EnterChat.getText() + "\n");
-					EnterChat.setText("");
+				    SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss"); 
+				    
+					if(!(UserList.getSelectionCount() == 0)){
+						
+						nc.sendChat(EnterChat.getText(), UserList.getSelection()[0]);
+						ChatWindow.append("[ "+ ft.format(dNow) +" ] Me: " + EnterChat.getText() + "\n");
+						EnterChat.setText("");
+						
+					}else{
+						ChatWindow.append("[ "+ ft.format(dNow) +" ] SYSTEM: Please select User to send chat to!\n");
+					}
 				}
+			}
+		});
+		
+		
+		btnSendFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				if(fileInput.getText().length() > 0){
+					
+					nc.sendFile(fileInput.getText(), "AAAAAAAA");
+					
+				}
+				
 			}
 		});
 

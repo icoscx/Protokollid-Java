@@ -1,10 +1,27 @@
 package main;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.DatagramChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.ini4j.Ini;
+import com.didisoft.pgp.PGPKeyPair;
 
+import lw.bouncycastle.util.encoders.Base64;
 import message.Message;
+import message.data.type.FileData;
 import message.data.type.TextMessageData;
 import network.ParsingFunctions;
 
@@ -20,22 +37,67 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
-		Queue<String> ll = new LinkedList<>();
-		ll.add("s");ll.add("s");ll.add("s");
-		while(true){
-			try {
-
-				ll.poll();
-				if(ll.isEmpty()){ throw new Exception("empty");}
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Thread.sleep(3000);
+		String fname = "q";
+		String encodedBase64 = "";
+		
+		try {
+			File file = new File("files/" + fname);
+		    FileInputStream is = new FileInputStream(file);
+		    byte[] chunk = new byte[87];
+		    int chunkLen = 0;
+		    FileOutputStream fos = new FileOutputStream("files/1", true);
+		    while ((chunkLen = is.read(chunk)) != -1) {
+		        // your code..
+		    	System.out.println("chunllen: " + chunkLen);
+		    	if(chunkLen == 87){
+		    		fos.write(chunk);
+		    	}else{
+		    		byte[] b = new byte[87 - (87-chunkLen)];
+		    		b = Arrays.copyOfRange(chunk, 0, 87 - (87-chunkLen));
+		    		System.out.println("last bytes; " + b.length);
+		    		fos.write(b);
+		    	}
+		    }
+		    fos.close();
+		    //encodedBase64 = new String(Base64.encode(bytes));
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    MainWindow.throwQueue.add(e.toString());
 		}
+		/**
+		String encodedBase64 = new String(Base64.encode("tere-dfs-sf<-f<-dsf-<df-<d-f<-sdf-<sdf-<-f<f".getBytes("ASCII")));
+		System.out.println(encodedBase64);
 		
+		String encodedBase642 = new String(Base64.encode("tere-dfs-sf<-f<-dsf-<df-<d-f<-sdf-<sdf-<-f<f".getBytes()));
+		System.out.println(encodedBase642);
+		/**
+		 PGPKeyPair key = new PGPKeyPair("keys/peer2");
+		   System.out.println("Key ID hexadecimal");
+		   System.out.println( key.getKeyIDHex());
+		*/
+		/**
+		DatagramChannel udpchannel = DatagramChannel.open();
+		DatagramSocket udpsocket = udpchannel.socket();
+		SocketAddress sa = new InetSocketAddress("172.16.1.1", 5000);
+		udpsocket.bind(sa);
 		
+		DatagramChannel udpchannel2 = DatagramChannel.open();
+		DatagramSocket udpsocket2 = udpchannel2.socket();
+		SocketAddress sa2 = new InetSocketAddress("172.16.1.2", 5000);
+		udpsocket2.bind(sa2);
+		
+		/**
+		long start = System.currentTimeMillis();
+		Thread.sleep(1000);
+		long end = System.currentTimeMillis();
+
+		System.out.println("Took : " + ((end - start)));
+		
+
+		   
+		   Ini ini = new Ini(new File("config.ini"));
+		   System.out.println(ini.get("config", "listeningport"));
+		 
 		/**String data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 		Queue<String> ll = new LinkedList<String>();

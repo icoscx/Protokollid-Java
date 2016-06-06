@@ -16,6 +16,7 @@ public class DatagramClient {
 	
 	private String ip = "";
 	private int port = 0;
+	public int hopCountFromResponse = 0;
 	
 	public static volatile Queue<String> debugMessages = new ConcurrentLinkedQueue<String>();
 	/**
@@ -28,7 +29,7 @@ public class DatagramClient {
 		this.ip = IP;
 	}
 
-	public void send(Message msg){
+	public boolean send(Message msg){
 		
 		try {
 			InetAddress IPAddress = InetAddress.getByName(this.ip);
@@ -56,6 +57,9 @@ public class DatagramClient {
 			String sentFlag = msg.getFlag();
 			
 			msg = ParsingFunctions.classifyPacket(new Message(receivePacket.getData()));
+			
+			hopCountFromResponse = Integer.decode("0x" + msg.getHopCount());
+			
 			//die if unexpected responses
 			if((sentType.equals("02") || sentType.equals("04")) 
 					&& !msg.getFlag().equals("04")){
@@ -94,7 +98,10 @@ public class DatagramClient {
 			// TODO: handle exception
 			e.printStackTrace();
 			MainWindow.throwQueue.add(e.toString());
+			return false;
 		}
+		
+		return true;
     
 	}
 	
