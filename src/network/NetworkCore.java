@@ -130,7 +130,7 @@ public class NetworkCore extends Thread{
 								recvdPkts=0;
 								Date old = dNow;
 								dNow = new Date();
-								receivedFile.add(new String("Recieved file from: " + from + " named as: files/" + ft.format(old) + "Transfer Complete!"));
+								receivedFile.add(new String("Recieved file from: " + from + " named as: files/" + ft.format(old) + " Transfer Complete!"));
 								continue;
 							}
 						}

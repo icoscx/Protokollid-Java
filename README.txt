@@ -1,6 +1,6 @@
 Version 0.1.34a alpha, no automatic tests, very raw
 Ivo Pure, Karl Mendelman, Kristjan Rõõm -> names also present in MainWindow.class (only)
-Java 32 and 64 are required to run this.
+Java x32 and x64 are required to run this.
 
 Usage:
 *Key folder

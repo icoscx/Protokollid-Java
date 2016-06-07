@@ -284,13 +284,13 @@ public class MainWindow{
 		
 		Composite comp_debugger = new Composite(shlChatV, SWT.NONE);
 		comp_debugger.setLocation(0, 0);
-		comp_debugger.setSize(761, 397);
+		comp_debugger.setSize(762, 396);
 		comp_debugger.setLayout(null);
 		
 		DebugText = new Text(comp_debugger, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		DebugText.setEditable(false);
 		DebugText.setLocation(0, 0);
-		DebugText.setSize(751, 387);
+		DebugText.setSize(752, 386);
 		formToolkit.adapt(DebugText, true, true);
 		
 		btnAddNeighbour.addSelectionListener(new SelectionAdapter() {
@@ -396,6 +396,30 @@ public class MainWindow{
 						ChatWindow.append("[ "+ ft.format(dNow) +" ] SYSTEM: Please select User to send file to!\n");
 					}
 					
+				}
+				
+			}
+		});
+		
+		btnSendALL.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				Date dNow = new Date( );
+			    SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss");
+				
+				if(UserList.getItemCount() > 0){
+					
+					ArrayList<String> currentList = new ArrayList<String>(Arrays.asList(UserList.getItems()));
+					
+					for (String user : currentList) {
+						
+						nc.sendChat(EnterChat.getText(), user);
+						
+					}
+					
+				}else{
+					ChatWindow.append("[ "+ ft.format(dNow) +" ] SYSTEM: YOu need to have atleast one friend for multychat!\n");
 				}
 				
 			}
