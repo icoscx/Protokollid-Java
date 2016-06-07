@@ -76,19 +76,19 @@ public class DatagramServer extends Thread{
                                 write(key);
                                 key.interestOps(SelectionKey.OP_READ);
                             }
+                            
                         } catch (Exception e) {
                         	MainWindow.throwQueue.add("DatagramServer: key error... " +(e.getMessage()!=null?e.getMessage():""));
                             e.printStackTrace();
                             MainWindow.throwQueue.add(e.toString());
                         }
                     }
-                    Thread.sleep(1);
                 } catch (Exception e) {
                 	MainWindow.throwQueue.add("DatagramServer: selector error... " +(e.getMessage()!=null?e.getMessage():""));
                     e.printStackTrace();
                     MainWindow.throwQueue.add(e.toString());
                 }
-
+                
             }//end while true
             
         } catch (IOException e) {

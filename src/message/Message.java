@@ -146,6 +146,11 @@ public class Message {
 	     return bytes;
 	}
 	
+	public byte[] getPayloadDataInBytes() throws Exception{
+		
+		return hexToBytes(this.payload);
+	}
+	
 	public String getPayloadDataAscii() throws UnsupportedEncodingException{
 		
 		return new String(hexToBytes(this.payload), "ASCII");

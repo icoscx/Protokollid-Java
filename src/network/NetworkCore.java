@@ -2,14 +2,17 @@ package network;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import lw.bouncycastle.util.encoders.Base64;
 import main.MainWindow;
 import message.Message;
+import message.data.type.FileData;
 import message.data.type.TextMessageData;
 import network.client.DatagramClient;
 import network.peering.Neighbour;
@@ -32,6 +35,8 @@ public class NetworkCore extends Thread{
 	
 	public volatile Queue<String> receivedChat = new ConcurrentLinkedQueue<String>();
 	
+	public volatile Queue<String> receivedFile = new ConcurrentLinkedQueue<String>();
+	
 	public void start(){
 	    if (t == null)
 	     {
@@ -49,7 +54,10 @@ public class NetworkCore extends Thread{
 		try {
 			
 			String collectable = "";
-			
+			Date dNow = new Date( );
+			int delay = 0;
+			int recvdPkts = 0;
+
 			while(true){
 				
 				try {
@@ -99,13 +107,47 @@ public class NetworkCore extends Thread{
 								collectable += DatagramServer.packetCache.poll().getPayloadDataAscii();
 								receivedChat.add(collectable);
 								collectable = "";
+								continue;
+							}
+						}
+
+						if(DatagramServer.packetCache.peek().getClass().getSimpleName().equals("FileData")){
+
+						    SimpleDateFormat ft = new SimpleDateFormat ("HH_mm_ss"); //ft.format(dNow);
+						    FileOutputStream fos = new FileOutputStream("files/" + ft.format(dNow), true);
+							recvdPkts++;
+							String from = DatagramServer.packetCache.peek().getSource();
+							//1011 0B  //1010 0A  //1001 09  //1000 08
+							if(DatagramServer.packetCache.peek().getFlag().equals("0A") || DatagramServer.packetCache.peek().getFlag().equals("08")){
+
+								fos.write(DatagramServer.packetCache.poll().getPayloadDataInBytes());
+								
+							}else if(DatagramServer.packetCache.peek().getFlag().equals("0B") || DatagramServer.packetCache.peek().getFlag().equals("09")){
+
+								fos.write(DatagramServer.packetCache.poll().getPayloadDataInBytes());
+								fos.close();
+								System.out.println("Real recieevd packet count: " + recvdPkts);
+								recvdPkts=0;
+								Date old = dNow;
+								dNow = new Date();
+								receivedFile.add(new String("Recieved file from: " + from + " named as: files/" + ft.format(old) + "Transfer Complete!"));
+								continue;
 							}
 						}
 						
 						//not recognized packet, throw away
-						DatagramServer.packetCache.poll();
+						if(!(DatagramServer.packetCache.isEmpty()) && (delay < 1000)){
+								delay++;
+							}else if(!(DatagramServer.packetCache.isEmpty())){
+								System.out.println("Tossed away unhandled packet: " + DatagramServer.packetCache.poll().debugString());
+								delay = 0;
+							}
+
+					}//end packetcache
+					if(DatagramServer.packetCache.isEmpty()){
+						delay = 0;
 					}
-					
+			
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					MainWindow.throwQueue.add("Core error, starting new cycle");
@@ -167,26 +209,53 @@ public class NetworkCore extends Thread{
 		}
 		 
 	 }
-	 
+	 /**
+	  * 
+	  * @param exact file name to send
+	  * @param Destination to whom in HEX id (8)
+	  */
 	 public void sendFile(String fname, String destination){
 
         try {
 			
 			try {
 				File file = new File("files/" + fname);
-			    FileInputStream is = new FileInputStream(file);
-			    byte[] chunk = new byte[1024];
+			    @SuppressWarnings("resource")
+				FileInputStream is = new FileInputStream(file);
+			    byte[] chunk = new byte[87];
 			    int chunkLen = 0;
+			    //FileOutputStream fos = new FileOutputStream("files/1", true);
+			    int i = 0;
 			    while ((chunkLen = is.read(chunk)) != -1) {
-			        // your code..
+
+			    	if(chunkLen == 87){
+			    		//fos.write(chunk);
+						 if((i % 2 == 0)){
+							 clientDataToSend.add(new FileData(ParsingFunctions.myUUID, destination, chunkLen, new String(chunk, "ASCII"), false, false));
+						 }else if((i % 2 == 1)){
+							 clientDataToSend.add(new FileData(ParsingFunctions.myUUID, destination, chunkLen, new String(chunk, "ASCII"), true, false));
+						 }
+
+			    	}else{
+			    		byte[] lastByte = new byte[87 - (87-chunkLen)];
+			    		lastByte = Arrays.copyOfRange(chunk, 0, 87 - (87-chunkLen));
+						 if((i % 2 == 0)){
+							 clientDataToSend.add(new FileData(ParsingFunctions.myUUID, destination, chunkLen, new String(lastByte, "ASCII"), false, true));
+						 }else if((i % 2 == 1)){
+							 clientDataToSend.add(new FileData(ParsingFunctions.myUUID, destination, chunkLen, new String(lastByte, "ASCII"), true, true));
+						 }
+			    		System.out.println("last bytes; " + lastByte.length);
+			    		System.out.println("TOTAL pieces sent: " + (i + 1));
+			    		//fos.write(lastByte);
+			    	}
+			    	i++;
 			    }
-			    //encodedBase64 = new String(Base64.encode(bytes));
+			    //fos.close();
 			} catch (Exception e) {
 			    e.printStackTrace();
 			    MainWindow.throwQueue.add(e.toString());
 			}
 			
-			Queue<String> pieces = dissassemble(encodedBase64);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

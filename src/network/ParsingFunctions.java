@@ -195,7 +195,15 @@ public class ParsingFunctions {
 					|| msg.getFlag().equals("0A") //1010
 					|| msg.getFlag().equals("0B") //1011
 							){
-						return new FileData(msg.getByteData());
+						//return new FileData(msg.getByteData());
+						
+						if(msg.getFlag().equals("08") || msg.getFlag().equals("09")){
+							msg = new ACKSQ0Control(myUUID, msg.getSource());
+						}else if(msg.getFlag().equals("0A") || msg.getFlag().equals("0B")){
+							msg = new ACKSQ1Control(myUUID, msg.getSource());
+						}
+						
+						return msg;
 					}
 					
 					if(msg.getFlag().equals("20")//0010 0000

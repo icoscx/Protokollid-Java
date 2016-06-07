@@ -37,6 +37,7 @@ public class Debugger {
 	public static void main(String[] args) throws UnsupportedEncodingException, Exception {
 		// TODO Auto-generated method stub
 
+		/**
 		String fname = "q";
 		String encodedBase64 = "";
 		
@@ -87,6 +88,11 @@ public class Debugger {
 		udpsocket2.bind(sa2);
 		
 		/**
+		 * 		
+		 * 
+		
+
+		
 		long start = System.currentTimeMillis();
 		Thread.sleep(1000);
 		long end = System.currentTimeMillis();

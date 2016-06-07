@@ -113,6 +113,10 @@ public class MainWindow{
 					if(!throwQueue.isEmpty()){
 						DebugText.append(throwQueue.poll() + "\n");
 					}
+					
+					if(DebugText.getText().length() > 10000){
+						DebugText.setText("");
+					}
 				}
 			});
 			
@@ -125,7 +129,21 @@ public class MainWindow{
 						Date dNow = new Date( );
 					    SimpleDateFormat ft = 
 					    new SimpleDateFormat ("HH:mm:ss");  
-						throwQueue.add("[ "+ ft.format(dNow) + " ] " + lastChatFrom + ": " + nc.receivedChat.poll() + "\n");
+					    ChatWindow.append("[ "+ ft.format(dNow) + " ] " + lastChatFrom + ": " + nc.receivedChat.poll() + "\n");
+					}	
+				}
+			});
+			
+			display.asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					if(!nc.receivedFile.isEmpty()){
+						Date dNow = new Date( );
+					    SimpleDateFormat ft = 
+					    new SimpleDateFormat ("HH:mm:ss");  
+					    ChatWindow.append("[ "+ ft.format(dNow) + " ] SYSTEM: " + nc.receivedFile.poll() + "\n");
 					}	
 				}
 			});
@@ -229,18 +247,14 @@ public class MainWindow{
 		uuidToAdd.setBounds(281, 355, 69, 21);
 		formToolkit.adapt(uuidToAdd, true, true);
 		
-		ProgressBar progressBar = new ProgressBar(comp_main, SWT.NONE);
-		progressBar.setBounds(93, 383, 442, 17);
-		formToolkit.adapt(progressBar, true, true);
-		
 		Label lblTransferFile = new Label(comp_main, SWT.NONE);
-		lblTransferFile.setBounds(10, 383, 77, 15);
+		lblTransferFile.setBounds(466, 385, 69, 15);
 		formToolkit.adapt(lblTransferFile, true, true);
-		lblTransferFile.setText("Transfer file");
+		lblTransferFile.setText("Transfer file: ");
 		
 		fileInput = new Text(comp_main, SWT.BORDER);
 		fileInput.setText("file.exe");
-		fileInput.setBounds(541, 383, 145, 21);
+		fileInput.setBounds(541, 382, 145, 21);
 		formToolkit.adapt(fileInput, true, true);
 		
 		Label lblFilenameAndExt = new Label(comp_main, SWT.NONE);
@@ -249,7 +263,7 @@ public class MainWindow{
 		lblFilenameAndExt.setText("FileName and extension:");
 		
 		Button btnSendFile = new Button(comp_main, SWT.NONE);
-		btnSendFile.setBounds(690, 379, 75, 25);
+		btnSendFile.setBounds(688, 380, 75, 25);
 		formToolkit.adapt(btnSendFile, true, true);
 		btnSendFile.setText("Send File");
 		
@@ -270,13 +284,13 @@ public class MainWindow{
 		
 		Composite comp_debugger = new Composite(shlChatV, SWT.NONE);
 		comp_debugger.setLocation(0, 0);
-		comp_debugger.setSize(569, 309);
+		comp_debugger.setSize(761, 397);
 		comp_debugger.setLayout(null);
 		
 		DebugText = new Text(comp_debugger, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		DebugText.setEditable(false);
 		DebugText.setLocation(0, 0);
-		DebugText.setSize(559, 299);
+		DebugText.setSize(751, 387);
 		formToolkit.adapt(DebugText, true, true);
 		
 		btnAddNeighbour.addSelectionListener(new SelectionAdapter() {
@@ -369,7 +383,18 @@ public class MainWindow{
 				
 				if(fileInput.getText().length() > 0){
 					
-					nc.sendFile(fileInput.getText(), "AAAAAAAA");
+					Date dNow = new Date( );
+				    SimpleDateFormat ft = new SimpleDateFormat ("HH:mm:ss");
+					
+					if(!(UserList.getSelectionCount() == 0)){
+						
+						nc.sendFile(fileInput.getText(), UserList.getSelection()[0]);
+						ChatWindow.append("[ "+ ft.format(dNow) +" ] Me: Sending file to " + UserList.getSelection()[0] + "\n");
+						fileInput.setText("");
+						
+					}else{
+						ChatWindow.append("[ "+ ft.format(dNow) +" ] SYSTEM: Please select User to send file to!\n");
+					}
 					
 				}
 				
