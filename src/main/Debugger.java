@@ -206,7 +206,7 @@ public class Debugger {
 	    while(true){
 		String s = "";
 		Message m1 = new TextMessageData("aaaa", "xxxx", s.length() , s, false, true);
-		m1.setDestinationIP("172.16.5.240");
+		m1.setDestinationIP("192.168.2.34");
 		m1.setDestinationPort(9876);
 		System.out.println("\nSending:" + m1.toString());
 		DatagramClient dc1 = new DatagramClient();
