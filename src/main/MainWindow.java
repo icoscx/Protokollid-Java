@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.ProgressBar;
 /**
  * 
- * @author ivo.pure karl.mendelman kristjan.room
+ * @author ivo.pure
  *
  */
 public class MainWindow{
